@@ -3,6 +3,7 @@ import 'package:projet1/services/database_helper.dart';
 import 'package:projet1/models/client.dart';
 import 'package:projet1/screens/edit_client_screen.dart';
 import 'package:projet1/screens/add_client_screen.dart'; // Assurez-vous que ce chemin est correct
+import 'package:toastification/toastification.dart';
 
 class ClientListScreen extends StatefulWidget {
   @override
@@ -42,6 +43,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
   void _deleteClient(int id) async {
     await DatabaseHelper.instance.deleteClient(id);
+    toastification.show(
+        context: context, // optional if you use ToastificationWrapper
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        title: Text('Successful!'),
+        // you can also use RichText widget for title and description parameters
+        description: RichText(text: const TextSpan(text: 'Client deleted successfully ')),
+        alignment: Alignment.topRight,
+        direction: TextDirection.ltr,
+        animationDuration: const Duration(milliseconds: 300)
+    );
     _fetchClients();
   }
 
@@ -49,7 +62,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Client List'),
+        title: Text('Clients List'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),

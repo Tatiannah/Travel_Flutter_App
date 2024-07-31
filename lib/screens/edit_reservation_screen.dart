@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet1/models/reservation.dart';
 import 'package:projet1/services/database_helper.dart';
+import 'package:toastification/toastification.dart';
 
 class EditReservationScreen extends StatefulWidget {
   final Reservation reservation;
@@ -81,6 +82,18 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
 
       await DatabaseHelper.instance.updateReservation(updatedReservation);
 
+      toastification.show(
+          context: context, // optional if you use ToastificationWrapper
+          type: ToastificationType.success,
+          style: ToastificationStyle.fillColored,
+          autoCloseDuration: const Duration(seconds: 3),
+          title: Text('Successful!'),
+          // you can also use RichText widget for title and description parameters
+          description: RichText(text: const TextSpan(text: 'Client added successfully ')),
+          alignment: Alignment.topRight,
+          direction: TextDirection.ltr,
+          animationDuration: const Duration(milliseconds: 300)
+      );
       Navigator.pop(context, 'refresh');
     }
   }

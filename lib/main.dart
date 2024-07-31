@@ -56,7 +56,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.blue,
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.hotel),
-            label: 'Hôtels',
+            label: 'Hotels',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.location_on),
@@ -75,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
-            label: 'Réservations',
+            label: 'Reservations',
           ),
         ],
         currentIndex: _selectedIndex,
