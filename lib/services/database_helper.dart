@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:projet1/models/client.dart';
@@ -96,22 +98,26 @@ class DatabaseHelper {
 
     if (oldVersion < 4) {
       // Ajouter la colonne isConfirmed si elle n'existe pas encore
-      await _addColumnIfNotExists(db, 'reservation', 'isConfirmed', 'INTEGER DEFAULT 0');
+      await _addColumnIfNotExists(
+          db, 'reservation', 'isConfirmed', 'INTEGER DEFAULT 0');
     }
 
     if (oldVersion < 5) {
       // Ajouter la colonne isConfirmed si elle n'existe pas encore
-      await _addColumnIfNotExists(db, 'destination', 'nbr_pers_dispo', 'INTEGER');
+      await _addColumnIfNotExists(
+          db, 'destination', 'nbr_pers_dispo', 'INTEGER');
     }
     // Vous pouvez gérer d'autres versions si nécessaire
   }
 
-  Future<void> _addColumnIfNotExists(Database db, String tableName, String columnName, String columnType) async {
+  Future<void> _addColumnIfNotExists(Database db, String tableName,
+      String columnName, String columnType) async {
     final result = await db.rawQuery('PRAGMA table_info($tableName)');
     final columnExists = result.any((column) => column['name'] == columnName);
 
     if (!columnExists) {
-      await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
+      await db.execute(
+          'ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
     }
   }
 
@@ -288,4 +294,33 @@ class DatabaseHelper {
       whereArgs: [id],
     );
   }
+
+  FutureOr<Map<String, int>> getReservationsCountByPlace() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery('''
+      SELECT lieuDestination, COUNT(nom) as count
+      FROM reservation
+      GROUP BY lieuDestination
+    ''');
+
+    return {
+      for (var row in result) row['lieuDestination'] as String: row['count'] as int
+    };
+  }
+
+  FutureOr<Map<String, int>> getReservationsCountByHotel() async {
+    final db = await instance.database;
+
+    final result = await db.rawQuery('''
+      SELECT lieuHotel, COUNT(nom) as count
+      FROM reservation
+      GROUP BY lieuHotel
+    ''');
+
+    return {
+      for (var row in result) row['lieuHotel'] as String: row['count'] as int
+    };
+  }
+
 }

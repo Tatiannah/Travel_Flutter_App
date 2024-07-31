@@ -3,6 +3,7 @@ import 'package:projet1/screens/client_list_screen.dart';
 import 'package:projet1/screens/hotel_list_screen.dart';
 import 'package:projet1/screens/destination_list_screen.dart';
 import 'package:projet1/screens/reservation_list_screen.dart';
+import 'package:projet1/screens/statistics.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,9 +34,10 @@ class _MainScreenState extends State<MainScreen> {
     HotelList(),
     DestinationList(),
     ReservationList(),
+    ClientChart()
   ];
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 4;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -76,6 +78,10 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
             label: 'Reservations',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calculate),
+            label: 'Statistics',
           ),
         ],
         currentIndex: _selectedIndex,
