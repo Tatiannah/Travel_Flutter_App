@@ -11,6 +11,7 @@ class Reservation {
   String? type_transport; // Allow null
   String dateArrivee;
   String dateDepart;
+  bool isConfirmed; // New field
 
   Reservation({
     this.id,
@@ -25,6 +26,7 @@ class Reservation {
     this.type_transport,
     required this.dateArrivee,
     required this.dateDepart,
+    this.isConfirmed = false, // Default value
   });
 
   factory Reservation.fromMap(Map<String, dynamic> json) => Reservation(
@@ -40,6 +42,7 @@ class Reservation {
     type_transport: json['type_transport'],
     dateArrivee: json['dateArrivee'],
     dateDepart: json['dateDepart'],
+    isConfirmed: json['isConfirmed'] == 1, // Convert from int to bool
   );
 
   Map<String, dynamic> toMap() => {
@@ -54,5 +57,6 @@ class Reservation {
     'type_transport': type_transport,
     'dateArrivee': dateArrivee,
     'dateDepart': dateDepart,
+    'isConfirmed': isConfirmed ? 1 : 0, // Convert from bool to int
   };
 }

@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4, // Augmenter la version de la base de données
+      version: 5, // Augmenter la version de la base de données
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -79,11 +79,13 @@ class DatabaseHelper {
         type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')),
         dateArrivee DATE NOT NULL,
         dateDepart DATE NOT NULL,
+        isConfirmed INTEGER DEFAULT 0, -- Nouvelle colonne ajoutée
         FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
         FOREIGN KEY (nomDestination, lieuDestination) REFERENCES destination(nom, lieu)
       )
     ''');
   }
+
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
       await _addColumnIfNotExists(db, 'reservation', 'nomDestination', 'TEXT');
@@ -92,39 +94,11 @@ class DatabaseHelper {
     }
 
     if (oldVersion < 4) {
-      // Créer une nouvelle table avec la bonne structure
-      await db.execute('''
-      CREATE TABLE new_reservation (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nom TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        nomHotel TEXT,
-        lieuHotel TEXT,
-        nomDestination TEXT,
-        lieuDestination TEXT,
-        nbr_chambre INTEGER DEFAULT 0 CHECK(nbr_chambre >= 0),
-        nbr_pers INTEGER DEFAULT 0 CHECK(nbr_pers >= 0),
-        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')),
-        dateArrivee DATE NOT NULL,
-        dateDepart DATE NOT NULL,
-        FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
-        FOREIGN KEY (nomDestination, lieuDestination) REFERENCES destination(nom, lieu)
-      )
-    ''');
-
-      // Copier les données de l'ancienne table vers la nouvelle
-      await db.execute('''
-      INSERT INTO new_reservation (id, nom, phone, nomHotel, lieuHotel, nomDestination, lieuDestination, nbr_chambre, nbr_pers, type_transport, dateArrivee, dateDepart)
-      SELECT id, nom, phone, nomHotel, lieuHotel, nomDestination, lieuDestination, nbr_chambre, nbr_pers, type_transport, dateArrivee, dateDepart
-      FROM reservation
-    ''');
-
-      // Supprimer l'ancienne table
-      await db.execute('DROP TABLE reservation');
-
-      // Renommer la nouvelle table
-      await db.execute('ALTER TABLE new_reservation RENAME TO reservation');
+      // Ajouter la colonne isConfirmed si elle n'existe pas encore
+      await _addColumnIfNotExists(db, 'reservation', 'isConfirmed', 'INTEGER DEFAULT 0');
     }
+
+    // Vous pouvez gérer d'autres versions si nécessaire
   }
 
   Future<void> _addColumnIfNotExists(Database db, String tableName, String columnName, String columnType) async {
@@ -135,8 +109,6 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
     }
   }
-
-
 
   // CRUD pour les Clients
   Future<int> insertClient(Client client) async {
