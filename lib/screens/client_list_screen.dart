@@ -111,7 +111,26 @@ class _ClientListScreenState extends State<ClientListScreen> {
                       backgroundColor: Colors.blue, // Couleur de fond de l'avatar
                     ),
                     title: Text(client.nom),
-                    subtitle: Text(client.email),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.email, size: 16), // Icône d'email
+                            SizedBox(width: 4), // Espacement entre l'icône et le texte
+                            Text(client.email),
+                          ],
+                        ),
+                        SizedBox(height: 4), // Espacement entre les lignes
+                        Row(
+                          children: [
+                            Icon(Icons.phone, size: 16), // Icône de téléphone
+                            SizedBox(width: 4), // Espacement entre l'icône et le texte
+                            Text(client.phone),
+                          ],
+                        ),
+                      ],
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

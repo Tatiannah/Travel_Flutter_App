@@ -29,7 +29,7 @@ class _HotelListState extends State<HotelList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('List Hotels')),
+      appBar: AppBar(title: Text('Hotels List ')),
       body: SingleChildScrollView(
       child: Column(
       children: [
