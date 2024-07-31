@@ -1,28 +1,28 @@
 class Reservation {
-  int id;
+  int? id;
   String nom;
   String phone;
-  String nomHotel;
-  String lieuHotel;
-  String nomDestination;
-  String lieuDestination;
+  String? nomHotel; // Allow null
+  String? lieuHotel; // Allow null
+  String? nomDestination; // Allow null
+  String? lieuDestination; // Allow null
   int nbr_chambre;
   int nbr_pers;
-  String type_transport;
+  String? type_transport; // Allow null
   String dateArrivee;
   String dateDepart;
 
   Reservation({
-    required this.id,
+    this.id,
     required this.nom,
     required this.phone,
-    required this.nomHotel,
-    required this.lieuHotel,
-    required this.nomDestination,
-    required this.lieuDestination,
+    this.nomHotel,
+    this.lieuHotel,
+    this.nomDestination,
+    this.lieuDestination,
     required this.nbr_chambre,
     required this.nbr_pers,
-    required this.type_transport,
+    this.type_transport,
     required this.dateArrivee,
     required this.dateDepart,
   });
@@ -43,7 +43,6 @@ class Reservation {
   );
 
   Map<String, dynamic> toMap() => {
-    'id': id,
     'nom': nom,
     'phone': phone,
     'nomHotel': nomHotel,

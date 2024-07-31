@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 4, // Augmenter la version de la base de données
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -70,13 +70,13 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nom TEXT NOT NULL,
         phone TEXT NOT NULL,
-        nomHotel TEXT NOT NULL,
-        lieuHotel TEXT NOT NULL,
-        nomDestination TEXT NOT NULL,
-        lieuDestination TEXT NOT NULL,
-        nbr_chambre INTEGER NOT NULL,
-        nbr_pers INTEGER NOT NULL,
-        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')) NOT NULL,
+        nomHotel TEXT,
+        lieuHotel TEXT,
+        nomDestination TEXT,
+        lieuDestination TEXT,
+        nbr_chambre INTEGER DEFAULT 0 CHECK(nbr_chambre >= 0),
+        nbr_pers INTEGER DEFAULT 0 CHECK(nbr_pers >= 0),
+        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')),
         dateArrivee DATE NOT NULL,
         dateDepart DATE NOT NULL,
         FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
@@ -84,17 +84,59 @@ class DatabaseHelper {
       )
     ''');
   }
-
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
+    if (oldVersion < 3) {
+      await _addColumnIfNotExists(db, 'reservation', 'nomDestination', 'TEXT');
+      await _addColumnIfNotExists(db, 'reservation', 'lieuDestination', 'TEXT');
+      await _addColumnIfNotExists(db, 'reservation', 'type_transport', 'TEXT');
+    }
+
+    if (oldVersion < 4) {
+      // Créer une nouvelle table avec la bonne structure
       await db.execute('''
-        ALTER TABLE reservation ADD COLUMN nbr_chambre INTEGER
-      ''');
+      CREATE TABLE new_reservation (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        nomHotel TEXT,
+        lieuHotel TEXT,
+        nomDestination TEXT,
+        lieuDestination TEXT,
+        nbr_chambre INTEGER DEFAULT 0 CHECK(nbr_chambre >= 0),
+        nbr_pers INTEGER DEFAULT 0 CHECK(nbr_pers >= 0),
+        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')),
+        dateArrivee DATE NOT NULL,
+        dateDepart DATE NOT NULL,
+        FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
+        FOREIGN KEY (nomDestination, lieuDestination) REFERENCES destination(nom, lieu)
+      )
+    ''');
+
+      // Copier les données de l'ancienne table vers la nouvelle
       await db.execute('''
-        ALTER TABLE reservation ADD COLUMN nbr_pers INTEGER
-      ''');
+      INSERT INTO new_reservation (id, nom, phone, nomHotel, lieuHotel, nomDestination, lieuDestination, nbr_chambre, nbr_pers, type_transport, dateArrivee, dateDepart)
+      SELECT id, nom, phone, nomHotel, lieuHotel, nomDestination, lieuDestination, nbr_chambre, nbr_pers, type_transport, dateArrivee, dateDepart
+      FROM reservation
+    ''');
+
+      // Supprimer l'ancienne table
+      await db.execute('DROP TABLE reservation');
+
+      // Renommer la nouvelle table
+      await db.execute('ALTER TABLE new_reservation RENAME TO reservation');
     }
   }
+
+  Future<void> _addColumnIfNotExists(Database db, String tableName, String columnName, String columnType) async {
+    final result = await db.rawQuery('PRAGMA table_info($tableName)');
+    final columnExists = result.any((column) => column['name'] == columnName);
+
+    if (!columnExists) {
+      await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
+    }
+  }
+
+
 
   // CRUD pour les Clients
   Future<int> insertClient(Client client) async {
@@ -195,9 +237,14 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> insertReservation(Reservation reservation) async {
-    Database db = await instance.database;
-    return await db.insert('reservation', reservation.toMap());
+  Future<void> insertReservation(Reservation reservation) async {
+    final db = await instance.database;
+
+    await db.insert(
+      'reservation',
+      reservation.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<String>> queryHotelLieux() async {
@@ -255,9 +302,10 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteReservation(int id) async {
-    Database db = await instance.database;
-    return await db.delete(
+  Future<void> deleteReservation(int id) async {
+    final db = await instance.database;
+
+    await db.delete(
       'reservation',
       where: 'id = ?',
       whereArgs: [id],

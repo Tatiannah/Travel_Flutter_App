@@ -26,7 +26,6 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
   late TextEditingController _dateArriveeController;
   late TextEditingController _dateDepartController;
 
-
   @override
   void initState() {
     super.initState();
@@ -41,7 +40,6 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     _typeTransportController = TextEditingController(text: widget.reservation.type_transport);
     _dateArriveeController = TextEditingController(text: widget.reservation.dateArrivee);
     _dateDepartController = TextEditingController(text: widget.reservation.dateDepart);
-
   }
 
   @override
@@ -61,6 +59,20 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.parse(controller.text),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != DateTime.parse(controller.text)) {
+      setState(() {
+        controller.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
   void _updateReservation() async {
     if (_formKey.currentState!.validate()) {
       Reservation updatedReservation = Reservation(
@@ -76,7 +88,6 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
         type_transport: _typeTransportController.text,
         dateArrivee: _dateArriveeController.text,
         dateDepart: _dateDepartController.text,
-
       );
 
       await DatabaseHelper.instance.updateReservation(updatedReservation);
@@ -189,27 +200,37 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _dateArriveeController,
-                decoration: InputDecoration(labelText: 'Date d\'Arrivée'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer la date d\'arrivée';
-                  }
-                  return null;
-                },
+              GestureDetector(
+                onTap: () => _selectDate(context, _dateArriveeController),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _dateArriveeController,
+                    decoration: InputDecoration(labelText: 'Date d\'Arrivée'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer la date d\'arrivée';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: _dateDepartController,
-                decoration: InputDecoration(labelText: 'Date de Départ'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer la date de départ';
-                  }
-                  return null;
-                },
+              GestureDetector(
+                onTap: () => _selectDate(context, _dateDepartController),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _dateDepartController,
+                    decoration: InputDecoration(labelText: 'Date de Départ'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Veuillez entrer la date de départ';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
               ),
-
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _updateReservation,
                 child: Text('Mettre à jour'),

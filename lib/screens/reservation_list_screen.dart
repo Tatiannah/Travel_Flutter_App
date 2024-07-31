@@ -31,22 +31,99 @@ class _ReservationListState extends State<ReservationList> {
       appBar: AppBar(
         title: Text('Liste des Réservations'),
       ),
-      body: ListView.builder(
+      body: _reservationList.isEmpty
+          ? Center(child: Text('Aucune réservation trouvée'))
+          : ListView.builder(
         itemCount: _reservationList.length,
         itemBuilder: (context, index) {
           final reservation = _reservationList[index];
-          return ListTile(
-            title: Text(reservation.nom),
-            subtitle: Text(
-                'Hôtel: ${reservation.nomHotel} - Destination: ${reservation.nomDestination}'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditReservationScreen(reservation: reservation),
-                ),
-              ).then((_) => _loadReservations()); // Reload reservations on return
-            },
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(16),
+              leading: Icon(Icons.hotel, size: 40, color: Colors.blue),
+              title: Text(
+                reservation.nom,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Hôtel: ${reservation.nomHotel}'),
+                  Text('Destination: ${reservation.nomDestination}'),
+                  SizedBox(height: 8),
+                  Text(
+                    'Dates: ${reservation.dateArrivee} - ${reservation.dateDepart}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Chip(
+                          label: Text('${reservation.nbr_chambre} Chambres'),
+                          backgroundColor: Colors.orange[100],
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Chip(
+                          label: Text('${reservation.nbr_pers} Personnes'),
+                          backgroundColor: Colors.green[100],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              isThreeLine: true,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditReservationScreen(reservation: reservation),
+                  ),
+                ).then((_) => _loadReservations()); // Reload reservations on return
+              },
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: () async {
+                  final confirm = await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Supprimer la Réservation'),
+                      content: Text('Êtes-vous sûr de vouloir supprimer cette réservation?'),
+                      actions: [
+                        TextButton(
+                          child: Text('Annuler'),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        TextButton(
+                          child: Text('Supprimer'),
+                          onPressed: () => Navigator.of(context).pop(true),
+                        ),
+                      ],
+                    ),
+                  );
+
+          if (confirm) {
+          if (reservation.id != null) {
+          await DatabaseHelper.instance.deleteReservation(reservation.id!);
+          _loadReservations();
+          } else {
+          // Gérez le cas où l'ID est nul si nécessaire
+          print('Erreur : ID de réservation nul');
+          }
+          }
+
+
+        },
+              ),
+            ),
           );
         },
       ),
