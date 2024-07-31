@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5, // Augmenter la version de la base de données
+      version: 6, // Augmenter la version de la base de données
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -58,6 +58,7 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nom TEXT,
         description TEXT,
+        nbr_pers_dispo INTEGER,
         type_transport TEXT,
         image TEXT,
         lieu TEXT,
@@ -98,6 +99,10 @@ class DatabaseHelper {
       await _addColumnIfNotExists(db, 'reservation', 'isConfirmed', 'INTEGER DEFAULT 0');
     }
 
+    if (oldVersion < 5) {
+      // Ajouter la colonne isConfirmed si elle n'existe pas encore
+      await _addColumnIfNotExists(db, 'destination', 'nbr_pers_dispo', 'INTEGER');
+    }
     // Vous pouvez gérer d'autres versions si nécessaire
   }
 

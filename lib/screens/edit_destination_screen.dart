@@ -18,6 +18,7 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nomController;
   late TextEditingController _descriptionController;
+  late TextEditingController _nbrPersDispoController;
   late TextEditingController _typeTransportController;
   late TextEditingController _lieuController;
   late TextEditingController _prixController;
@@ -28,13 +29,15 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
     super.initState();
     _nomController = TextEditingController(text: widget.destination.nom);
     _descriptionController = TextEditingController(text: widget.destination.description);
-    _typeTransportController = TextEditingController(text: widget.destination.type_transport.toString());
+    _typeTransportController = TextEditingController(text: widget.destination.type_transport);
     _lieuController = TextEditingController(text: widget.destination.lieu);
     _prixController = TextEditingController(text: widget.destination.prix.toString());
+    _nbrPersDispoController = TextEditingController(text: widget.destination.nbr_pers_dispo.toString());
     _image = (widget.destination.image != null && widget.destination.image!.isNotEmpty)
         ? File(widget.destination.image!)
         : null;
   }
+
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -55,23 +58,24 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
         image: _image != null ? _image!.path : widget.destination.image,
         lieu: _lieuController.text,
         prix: double.parse(_prixController.text),
+        nbr_pers_dispo: int.parse(_nbrPersDispoController.text),
       );
       await DatabaseHelper.instance.updateDestination(updatedDestination);
       toastification.show(
-          context: context, // optional if you use ToastificationWrapper
-          type: ToastificationType.success,
-          style: ToastificationStyle.fillColored,
-          autoCloseDuration: const Duration(seconds: 3),
-          title: Text('Successful!'),
-          // you can also use RichText widget for title and description parameters
-          description: RichText(text: const TextSpan(text: 'Destination edited successfully ')),
-          alignment: Alignment.topRight,
-          direction: TextDirection.ltr,
-          animationDuration: const Duration(milliseconds: 300)
+        context: context,
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        title: Text('Successful!'),
+        description: RichText(text: const TextSpan(text: 'Destination edited successfully')),
+        alignment: Alignment.topRight,
+        direction: TextDirection.ltr,
+        animationDuration: const Duration(milliseconds: 300),
       );
       Navigator.pop(context, true);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +104,17 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter Address';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _nbrPersDispoController,
+                  decoration: InputDecoration(labelText: 'Number of people available'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the number of people available';
                     }
                     return null;
                   },

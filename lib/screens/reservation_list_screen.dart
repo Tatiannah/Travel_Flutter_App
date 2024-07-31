@@ -57,6 +57,37 @@ class _ReservationListState extends State<ReservationList> {
     } else {
       print('Hôtel non trouvé');
     }
+    // Vérifiez les disponibilités de la destination
+    final destination = await db.query(
+      'destination',
+      where: 'nom = ? AND lieu = ?',
+      whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+    );
+
+    if (destination.isNotEmpty) {
+      final availablePeople = destination.first['nbr_pers_dispo'] as int;
+      if (availablePeople >= reservation.nbr_pers) {
+        // Mettre à jour le nombre de personnes disponibles dans la destination
+        await db.update(
+          'destination',
+          {'nbr_pers_dispo': availablePeople - reservation.nbr_pers},
+          where: 'nom = ? AND lieu = ?',
+          whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+        );
+        // Mettre à jour l'état de la réservation
+        await db.update(
+          'reservation',
+          {'isConfirmed': 1},
+          where: 'id = ?',
+          whereArgs: [reservation.id],
+        );
+        print('Réservation confirmée pour ${reservation.nom}');
+      } else {
+        print('Pas assez de personnes disponibles dans la destination');
+      }
+    } else {
+      print('Destination non trouvée');
+    }
   }
 
   @override

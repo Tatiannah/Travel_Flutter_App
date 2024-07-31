@@ -13,6 +13,7 @@ class AddDestinationScreen extends StatefulWidget {
 class _AddDestinationScreenState extends State<AddDestinationScreen> {
   final _nomController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _nbrPersDispoController = TextEditingController();
   final _typeTransportController = TextEditingController();
   final _lieuController = TextEditingController();
   final _prixController = TextEditingController();
@@ -34,24 +35,25 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
     final lieu = _lieuController.text;
     final image = _image?.path ?? '';
 
-    if (nom.isEmpty || description.isEmpty || lieu.isEmpty || _typeTransportController.text.isEmpty || _prixController.text.isEmpty) {
-      _showErrorDialog('All fields must be completed ');
+    if (nom.isEmpty || description.isEmpty || lieu.isEmpty || type_transport.isEmpty || _prixController.text.isEmpty || _nbrPersDispoController.text.isEmpty) {
+      _showErrorDialog('All fields must be completed');
       return;
     }
+
     double? prix;
+    int? nbrPersDispo;
     try {
-
       prix = double.parse(_prixController.text);
+      nbrPersDispo = int.parse(_nbrPersDispoController.text);
     } catch (e) {
-      _showErrorDialog('Please enter valid values for the price.');
+      _showErrorDialog('Please enter valid values for the price and number of people.');
       return;
     }
-
 
     final destination = Destination(
       nom: nom,
       description: description,
-
+      nbr_pers_dispo: nbrPersDispo,
       type_transport: type_transport,
       image: image,
       lieu: lieu,
@@ -60,19 +62,19 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
 
     await DatabaseHelper.instance.insertDestination(destination);
     toastification.show(
-        context: context, // optional if you use ToastificationWrapper
-        type: ToastificationType.success,
-        style: ToastificationStyle.fillColored,
-        autoCloseDuration: const Duration(seconds: 3),
-        title: Text('Successful!'),
-        // you can also use RichText widget for title and description parameters
-        description: RichText(text: const TextSpan(text: 'Client added successfully ')),
-        alignment: Alignment.topRight,
-        direction: TextDirection.ltr,
-        animationDuration: const Duration(milliseconds: 300)
+      context: context,
+      type: ToastificationType.success,
+      style: ToastificationStyle.fillColored,
+      autoCloseDuration: const Duration(seconds: 3),
+      title: Text('Successful!'),
+      description: RichText(text: const TextSpan(text: 'Destination added successfully')),
+      alignment: Alignment.topRight,
+      direction: TextDirection.ltr,
+      animationDuration: const Duration(milliseconds: 300),
     );
     Navigator.pop(context, true);
   }
+
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -109,6 +111,12 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: 'Description'),
               ),
+              TextField(
+                controller: _nbrPersDispoController,
+                decoration: InputDecoration(labelText: 'Number of people available'),
+                keyboardType: TextInputType.number,
+              ),
+
               TextField(
                 controller: _typeTransportController,
                 decoration: InputDecoration(labelText: 'Transport_type'),
