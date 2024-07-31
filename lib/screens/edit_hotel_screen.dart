@@ -66,7 +66,7 @@ class _EditHotelScreenState extends State<EditHotelScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Modifier Hôtel')),
+      appBar: AppBar(title: Text('Edit Hotel')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -76,20 +76,20 @@ class _EditHotelScreenState extends State<EditHotelScreen> {
               children: <Widget>[
                 TextFormField(
                   controller: _nomController,
-                  decoration: InputDecoration(labelText: 'Nom'),
+                  decoration: InputDecoration(labelText: 'Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nom';
+                      return 'Please enter name';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: InputDecoration(labelText: 'Adresse'),
+                  decoration: InputDecoration(labelText: 'Address'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer l\'adresse';
+                      return 'PLease enter address';
                     }
                     return null;
                   },
@@ -99,39 +99,39 @@ class _EditHotelScreenState extends State<EditHotelScreen> {
                   decoration: InputDecoration(labelText: 'Phone'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le numéro de téléphone';
+                      return 'Please enter number phone';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _nbrChambreDispoController,
-                  decoration: InputDecoration(labelText: 'Nombre de Chambres Disponibles'),
+                  decoration: InputDecoration(labelText: 'Numbers of bedrom available'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nombre de chambres disponibles';
+                      return 'Please the number of bedroom available ';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _lieuController,
-                  decoration: InputDecoration(labelText: 'Lieu'),
+                  decoration: InputDecoration(labelText: 'Place'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le lieu';
+                      return 'Please enter place';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _prixController,
-                  decoration: InputDecoration(labelText: 'Prix'),
+                  decoration: InputDecoration(labelText: 'Price'),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le prix';
+                      return 'Please enter place ';
                     }
                     return null;
                   },
@@ -139,13 +139,13 @@ class _EditHotelScreenState extends State<EditHotelScreen> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: _pickImage,
-                  child: Text('Choisir une Image'),
+                  child: Text('Choose Image'),
                 ),
                 _image != null ? Image.file(_image!) : Container(),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _updateHotel,
-                  child: Text('Modifier Hôtel'),
+                  child: Text('Edit Hotel'),
                 ),
               ],
             ),

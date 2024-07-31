@@ -146,20 +146,20 @@ class _DestinationListState extends State<DestinationList> {
                           bool confirmDelete = await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text('Confirmer la suppression'),
-                              content: Text('Voulez-vous vraiment supprimer cet destination?'),
+                              title: Text('Confirm Deletion'),
+                              content: Text('Are you sure you want to delete this destination ?'),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop(false);
                                   },
-                                  child: Text('Annuler'),
+                                  child: Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop(true);
                                   },
-                                  child: Text('Supprimer'),
+                                  child: Text('Delete'),
                                 ),
                               ],
                             ),

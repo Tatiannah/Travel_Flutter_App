@@ -85,20 +85,20 @@ class DestinationDetailScreen extends StatelessWidget {
                   bool confirmDelete = await showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Confirmer la suppression'),
-                      content: Text('Voulez-vous vraiment supprimer cette destination ?'),
+                      title: Text('Confirm deletion'),
+                      content: Text('Are you sure you want to delete this destination ?'),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           },
-                          child: Text('Annuler'),
+                          child: Text('Cancel'),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(true);
                           },
-                          child: Text('Supprimer'),
+                          child: Text('Delete'),
                         ),
                       ],
                     ),
@@ -115,7 +115,7 @@ class DestinationDetailScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8),
-                    Text('Supprimer'),
+                    Text('Delete'),
                   ],
                 ),
                 style: ElevatedButton.styleFrom(

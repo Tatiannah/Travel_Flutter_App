@@ -34,7 +34,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
     final image = _image?.path ?? '';
 
     if (nom.isEmpty || description.isEmpty || lieu.isEmpty || _typeTransportController.text.isEmpty || _prixController.text.isEmpty) {
-      _showErrorDialog('Tous les champs doivent être remplis.');
+      _showErrorDialog('All fields must be completed ');
       return;
     }
     double? prix;
@@ -42,7 +42,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
 
       prix = double.parse(_prixController.text);
     } catch (e) {
-      _showErrorDialog('Veuillez entrer des valeurs valides pour le prix.');
+      _showErrorDialog('Please enter valid values for the price.');
       return;
     }
 
@@ -65,7 +65,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Erreur'),
+        title: Text('Error'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
@@ -90,7 +90,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
             children: <Widget>[
               TextField(
                 controller: _nomController,
-                decoration: InputDecoration(labelText: 'Nom'),
+                decoration: InputDecoration(labelText: 'Name'),
               ),
               TextField(
                 controller: _descriptionController,
@@ -98,16 +98,16 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
               ),
               TextField(
                 controller: _typeTransportController,
-                decoration: InputDecoration(labelText: 'Type_transport'),
+                decoration: InputDecoration(labelText: 'Transport_type'),
               ),
 
               TextField(
                 controller: _lieuController,
-                decoration: InputDecoration(labelText: 'Lieu'),
+                decoration: InputDecoration(labelText: 'Place'),
               ),
               TextField(
                 controller: _prixController,
-                decoration: InputDecoration(labelText: 'Prix'),
+                decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
               SizedBox(height: 10),

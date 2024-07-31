@@ -45,7 +45,7 @@ class _EditClientScreenState extends State<EditClientScreen> {
           children: <Widget>[
             TextField(
               controller: _nomController,
-              decoration: InputDecoration(labelText: 'Nom'),
+              decoration: InputDecoration(labelText: 'Full name'),
             ),
             TextField(
               controller: _emailController,

@@ -35,7 +35,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
     final image = _image?.path ?? '';
 
     if (nom.isEmpty || description.isEmpty || phone.isEmpty || lieu.isEmpty || _nbrChambreDispoController.text.isEmpty || _prixController.text.isEmpty) {
-      _showErrorDialog('Tous les champs doivent être remplis.');
+      _showErrorDialog('All fields must be completed.');
       return;
     }
 
@@ -45,7 +45,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
       nbrChambreDispo = int.parse(_nbrChambreDispoController.text);
       prix = double.parse(_prixController.text);
     } catch (e) {
-      _showErrorDialog('Veuillez entrer des valeurs valides pour le nombre de chambres et le prix.');
+      _showErrorDialog('Please enter valid values for number of rooms and price.');
       return;
     }
 
@@ -67,7 +67,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Erreur'),
+        title: Text('Error'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
@@ -92,7 +92,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
             children: <Widget>[
               TextField(
                 controller: _nomController,
-                decoration: InputDecoration(labelText: 'Nom'),
+                decoration: InputDecoration(labelText: 'Name'),
               ),
               TextField(
                 controller: _descriptionController,
@@ -104,22 +104,22 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
               ),
               TextField(
                 controller: _nbrChambreDispoController,
-                decoration: InputDecoration(labelText: 'Nbr Chambre Dispo'),
+                decoration: InputDecoration(labelText: 'Number of rooms available'),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: _lieuController,
-                decoration: InputDecoration(labelText: 'Lieu'),
+                decoration: InputDecoration(labelText: 'Place'),
               ),
               TextField(
                 controller: _prixController,
-                decoration: InputDecoration(labelText: 'Prix'),
+                decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Choisir une Image'),
+                child: Text('Choose a Image'),
               ),
               _image != null ? Image.file(_image!) : Container(),
               SizedBox(height: 20),

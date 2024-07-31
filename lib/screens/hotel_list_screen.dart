@@ -87,7 +87,7 @@ class _HotelListState extends State<HotelList> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text('${hotel.prix} Ar/nuit',
+                      child: Text('${hotel.prix} Ar/night',
                           style: TextStyle(fontSize: 16)),
                     ),
                   ],
@@ -107,7 +107,7 @@ class _HotelListState extends State<HotelList> {
     final hotel = _hotelList[index + 6];
     return ListTile(
     title: Text(hotel.nom),
-    subtitle: Text('${hotel.prix} Ar/nuit'),
+    subtitle: Text('${hotel.prix} Ar/night'),
     leading: (hotel.image != null && hotel.image!.isNotEmpty)
     ? Image.file(File(hotel.image!), width: 50, height: 50, fit: BoxFit.cover)
         : Icon(Icons.hotel, size: 50),
@@ -146,20 +146,20 @@ class _HotelListState extends State<HotelList> {
           bool confirmDelete = await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Confirmer la suppression'),
-              content: Text('Voulez-vous vraiment supprimer cet hôtel?'),
+              title: Text('Confirm deletion'),
+              content: Text('Are you sure you want to remove this hotel from your list ?'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('Annuler'),
+                  child: Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('Supprimer'),
+                  child: Text('Delete'),
                 ),
               ],
             ),

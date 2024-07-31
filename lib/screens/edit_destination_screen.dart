@@ -63,7 +63,7 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Modification ')),
+      appBar: AppBar(title: Text('Edit ')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -73,20 +73,20 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
               children: <Widget>[
                 TextFormField(
                   controller: _nomController,
-                  decoration: InputDecoration(labelText: 'Nom'),
+                  decoration: InputDecoration(labelText: 'Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nom';
+                      return 'Please enter name';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: InputDecoration(labelText: 'Adresse'),
+                  decoration: InputDecoration(labelText: 'Address'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer l\'adresse';
+                      return 'Please enter Address';
                     }
                     return null;
                   },
@@ -94,32 +94,32 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
 
                 TextFormField(
                   controller: _typeTransportController,
-                  decoration: InputDecoration(labelText: 'Type de transport'),
+                  decoration: InputDecoration(labelText: 'Transport_Type'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le type de transport';
+                      return 'Please enter the type of Transport';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _lieuController,
-                  decoration: InputDecoration(labelText: 'Lieu'),
+                  decoration: InputDecoration(labelText: 'Place'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le lieu';
+                      return 'Please enter place ';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: _prixController,
-                  decoration: InputDecoration(labelText: 'Prix'),
+                  decoration: InputDecoration(labelText: 'Price '),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le prix';
+                      return 'Please enter price';
                     }
                     return null;
                   },
@@ -127,13 +127,13 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: _pickImage,
-                  child: Text('Choisir une Image'),
+                  child: Text('Choose a Image'),
                 ),
                 _image != null ? Image.file(_image!) : Container(),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _updateDestination,
-                  child: Text('Modifier'),
+                  child: Text('Edit'),
                 ),
               ],
             ),

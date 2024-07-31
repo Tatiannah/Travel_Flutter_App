@@ -64,7 +64,7 @@ class HotelDetailScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    '${hotel.prix} Ar/nuit',
+                    '${hotel.prix} Ar/night',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
@@ -85,20 +85,20 @@ class HotelDetailScreen extends StatelessWidget {
                   bool confirmDelete = await showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Confirmer la suppression'),
-                      content: Text('Voulez-vous vraiment supprimer cet hôtel ?'),
+                      title: Text('Confirm deletion'),
+                      content: Text('Are you sure you want to remove this hotel from your list ?'),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           },
-                          child: Text('Annuler'),
+                          child: Text('Cancel'),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(true);
                           },
-                          child: Text('Supprimer'),
+                          child: Text('Delete'),
                         ),
                       ],
                     ),
@@ -115,7 +115,7 @@ class HotelDetailScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.delete),
                     SizedBox(width: 8),
-                    Text('Supprimer'),
+                    Text('Delete'),
                   ],
                 ),
                 style: ElevatedButton.styleFrom(

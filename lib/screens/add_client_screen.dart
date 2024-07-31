@@ -33,7 +33,7 @@ class _AddClientScreenState extends State<AddClientScreen> {
           children: <Widget>[
             TextField(
               controller: _nomController,
-              decoration: InputDecoration(labelText: 'Nom'),
+              decoration: InputDecoration(labelText: 'Full name'),
             ),
             TextField(
               controller: _emailController,
