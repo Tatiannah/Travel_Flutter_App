@@ -25,7 +25,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
   late TextEditingController _typeTransportController;
   late TextEditingController _dateArriveeController;
   late TextEditingController _dateDepartController;
-  late TextEditingController _statutController;
+
 
   @override
   void initState() {
@@ -36,12 +36,12 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     _lieuHotelController = TextEditingController(text: widget.reservation.lieuHotel);
     _nomDestinationController = TextEditingController(text: widget.reservation.nomDestination);
     _lieuDestinationController = TextEditingController(text: widget.reservation.lieuDestination);
-    _nbrChambreController = TextEditingController(text: widget.reservation.nbrChambre.toString());
-    _nbrPersController = TextEditingController(text: widget.reservation.nbrPers.toString());
+    _nbrChambreController = TextEditingController(text: widget.reservation.nbr_chambre.toString());
+    _nbrPersController = TextEditingController(text: widget.reservation.nbr_pers.toString());
     _typeTransportController = TextEditingController(text: widget.reservation.typeTransport);
     _dateArriveeController = TextEditingController(text: widget.reservation.dateArrivee);
     _dateDepartController = TextEditingController(text: widget.reservation.dateDepart);
-    _statutController = TextEditingController(text: widget.reservation.statut);
+
   }
 
   @override
@@ -57,7 +57,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     _typeTransportController.dispose();
     _dateArriveeController.dispose();
     _dateDepartController.dispose();
-    _statutController.dispose();
+
     super.dispose();
   }
 
@@ -71,12 +71,12 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
         lieuHotel: _lieuHotelController.text,
         nomDestination: _nomDestinationController.text,
         lieuDestination: _lieuDestinationController.text,
-        nbrChambre: int.parse(_nbrChambreController.text),
-        nbrPers: int.parse(_nbrPersController.text),
+        nbr_chambre: int.parse(_nbrChambreController.text),
+        nbr_pers: int.parse(_nbrPersController.text),
         typeTransport: _typeTransportController.text,
         dateArrivee: _dateArriveeController.text,
         dateDepart: _dateDepartController.text,
-        statut: _statutController.text,
+
       );
 
       await DatabaseHelper.instance.updateReservation(updatedReservation);
@@ -209,17 +209,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _statutController,
-                decoration: InputDecoration(labelText: 'Statut'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le statut';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
+
               ElevatedButton(
                 onPressed: _updateReservation,
                 child: Text('Mettre à jour'),

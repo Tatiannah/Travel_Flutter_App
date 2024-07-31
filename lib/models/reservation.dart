@@ -6,12 +6,11 @@ class Reservation {
   String lieuHotel;
   String nomDestination;
   String lieuDestination;
-  int nbrChambre;
-  int nbrPers;
+  int nbr_chambre;
+  int nbr_pers;
   String typeTransport;
   String dateArrivee;
   String dateDepart;
-  String statut;
 
   Reservation({
     required this.id,
@@ -21,15 +20,14 @@ class Reservation {
     required this.lieuHotel,
     required this.nomDestination,
     required this.lieuDestination,
-    required this.nbrChambre,
-    required this.nbrPers,
+    required this.nbr_chambre,
+    required this.nbr_pers,
     required this.typeTransport,
     required this.dateArrivee,
     required this.dateDepart,
-    required this.statut,
   });
 
-  factory Reservation.fromMap(Map<String, dynamic> json) => new Reservation(
+  factory Reservation.fromMap(Map<String, dynamic> json) => Reservation(
     id: json['id'],
     nom: json['nom'],
     phone: json['phone'],
@@ -37,12 +35,11 @@ class Reservation {
     lieuHotel: json['lieuHotel'],
     nomDestination: json['nomDestination'],
     lieuDestination: json['lieuDestination'],
-    nbrChambre: json['nbrChambre'],
-    nbrPers: json['nbrPers'],
+    nbr_chambre: json['nbr_chambre'],
+    nbr_pers: json['nbr_pers'],
     typeTransport: json['typeTransport'],
     dateArrivee: json['dateArrivee'],
     dateDepart: json['dateDepart'],
-    statut: json['statut'],
   );
 
   Map<String, dynamic> toMap() => {
@@ -53,11 +50,10 @@ class Reservation {
     'lieuHotel': lieuHotel,
     'nomDestination': nomDestination,
     'lieuDestination': lieuDestination,
-    'nbrChambre': nbrChambre,
-    'nbrPers': nbrPers,
+    'nbr_chambre': nbr_chambre,
+    'nbr_pers': nbr_pers,
     'typeTransport': typeTransport,
     'dateArrivee': dateArrivee,
     'dateDepart': dateDepart,
-    'statut': statut,
   };
 }

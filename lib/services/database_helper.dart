@@ -4,6 +4,7 @@ import 'package:projet1/models/client.dart';
 import 'package:projet1/models/hotel.dart';
 import 'package:projet1/models/destination.dart';
 import 'package:projet1/models/reservation.dart';
+
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._instance();
   static Database? _database;
@@ -23,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // Incrémenter la version
+      version: 2,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -51,6 +52,7 @@ class DatabaseHelper {
         prix REAL
       )
     ''');
+
     await db.execute('''
       CREATE TABLE destination (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,31 +64,35 @@ class DatabaseHelper {
         prix REAL
       )
     ''');
-    await db.execute('''
-        CREATE TABLE reservation (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    nomHotel TEXT NOT NULL,
-    lieuHotel TEXT NOT NULL,
-    nomDestination TEXT NOT NULL,
-    lieuDestination TEXT NOT NULL,
-    nbr_chambre INTEGER NOT NULL,
-    nbr_pers INTEGER NOT NULL,
-    type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')) NOT NULL,
-    dateArrivee DATE NOT NULL,
-    dateDepart DATE NOT NULL,
-    statut TEXT CHECK(statut IN ('en attente', 'confirme', 'annule')) NOT NULL,
-    FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
-    FOREIGN KEY (nomDestination, lieuDestination) REFERENCES destination(nom, lieu)
-);
 
+    await db.execute('''
+      CREATE TABLE reservation (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        nomHotel TEXT NOT NULL,
+        lieuHotel TEXT NOT NULL,
+        nomDestination TEXT NOT NULL,
+        lieuDestination TEXT NOT NULL,
+        nbr_chambre INTEGER NOT NULL,
+        nbr_pers INTEGER NOT NULL,
+        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')) NOT NULL,
+        dateArrivee DATE NOT NULL,
+        dateDepart DATE NOT NULL,
+        FOREIGN KEY (nomHotel, lieuHotel) REFERENCES hotel(nom, lieu),
+        FOREIGN KEY (nomDestination, lieuDestination) REFERENCES destination(nom, lieu)
+      )
     ''');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE hotel ADD COLUMN description TEXT');
+      await db.execute('''
+        ALTER TABLE reservation ADD COLUMN nbr_chambre INTEGER
+      ''');
+      await db.execute('''
+        ALTER TABLE reservation ADD COLUMN nbr_pers INTEGER
+      ''');
     }
   }
 
@@ -156,7 +162,6 @@ class DatabaseHelper {
     );
   }
 
-
   // CRUD pour les destinations
   Future<int> insertDestination(Destination destination) async {
     final db = await database;
@@ -184,7 +189,7 @@ class DatabaseHelper {
   Future<int> deleteDestination(int id) async {
     final db = await database;
     return await db.delete(
-      'hotel',
+      'destination',
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -194,6 +199,7 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.insert('reservation', reservation.toMap());
   }
+
   Future<List<String>> queryHotelLieux() async {
     final db = await instance.database;
     final result = await db.rawQuery('SELECT DISTINCT lieu FROM hotel');
@@ -205,6 +211,31 @@ class DatabaseHelper {
     final result = await db.rawQuery('SELECT DISTINCT lieu FROM destination');
     return result.map((map) => map['lieu'] as String).toList();
   }
+
+  Future<List<String>> queryHotelNoms(String lieu) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'hotel',
+      columns: ['nom'],
+      where: 'lieu = ?',
+      whereArgs: [lieu],
+    );
+
+    return result.map((row) => row['nom'] as String).toList();
+  }
+
+  Future<List<String>> queryDestinationNoms(String lieu) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'destination',
+      columns: ['nom'],
+      where: 'lieu = ?',
+      whereArgs: [lieu],
+    );
+
+    return result.map((row) => row['nom'] as String).toList();
+  }
+
   Future<List<Reservation>> queryAllReservations() async {
     Database db = await instance.database;
     final List<Map<String, dynamic>> maps = await db.query('reservation');
