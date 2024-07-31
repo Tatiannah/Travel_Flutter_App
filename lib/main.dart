@@ -3,6 +3,7 @@ import 'package:projet1/screens/client_list_screen.dart';
 import 'package:projet1/screens/hotel_list_screen.dart';
 import 'package:projet1/screens/destination_list_screen.dart';
 import 'package:projet1/screens/reservation_list_screen.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Travel Booking App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -35,49 +37,53 @@ class _MainScreenState extends State<MainScreen> {
 
   int _selectedIndex = 0;
 
-  void _selectPage(int index) {
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    Navigator.of(context).pop(); // Close the drawer
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Travel Booking App'),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Menu'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
+        title: Center(
+          child: Text(
+            'Travel Booking App',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-            ListTile(
-              title: Text('Clients'),
-              onTap: () => _selectPage(0),
-            ),
-            ListTile(
-              title: Text('Hôtels'),
-              onTap: () => _selectPage(1),
-            ),
-            ListTile(
-              title: Text('Destinations'),
-              onTap: () => _selectPage(2),
-            ),
-            ListTile(
-              title: Text('Réservations'),
-              onTap: () => _selectPage(3),
-            ),
-          ],
+          ),
         ),
+        backgroundColor: Colors.red,
       ),
       body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Clients',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.hotel),
+            label: 'Hôtels',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on),
+            label: 'Destinations',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Réservations',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: Colors.blue,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.grey,
+      ),
     );
   }
 }
