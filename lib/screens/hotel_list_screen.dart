@@ -5,6 +5,7 @@ import 'add_hotel_screen.dart';
 import 'edit_hotel_screen.dart';
 import 'hotel_detail_screen.dart'; // Importez l'écran des détails de l'hôtel
 import 'dart:io';
+import 'package:toastification/toastification.dart';
 
 class HotelList extends StatefulWidget {
   @override
@@ -28,7 +29,7 @@ class _HotelListState extends State<HotelList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Hotels')),
+      appBar: AppBar(title: Text('Hotels List ')),
       body: SingleChildScrollView(
       child: Column(
       children: [
@@ -168,6 +169,18 @@ class _HotelListState extends State<HotelList> {
           if (confirmDelete) {
             // Supprimer l'hôtel de la base de données
             await DatabaseHelper.instance.deleteHotel(hotel.id!);
+            toastification.show(
+                context: context, // optional if you use ToastificationWrapper
+                type: ToastificationType.success,
+                style: ToastificationStyle.fillColored,
+                autoCloseDuration: const Duration(seconds: 3),
+                title: Text('Successful!'),
+                // you can also use RichText widget for title and description parameters
+                description: RichText(text: const TextSpan(text: 'Hotel deleted successfully ')),
+                alignment: Alignment.topRight,
+                direction: TextDirection.ltr,
+                animationDuration: const Duration(milliseconds: 300)
+            );
             // Recharger la liste des hôtels
             _loadHotels();
           }

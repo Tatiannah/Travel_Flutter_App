@@ -3,6 +3,7 @@ import 'package:projet1/services/database_helper.dart';
 import 'package:projet1/models/hotel.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:toastification/toastification.dart';
 
 class AddHotelScreen extends StatefulWidget {
   @override
@@ -60,6 +61,18 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
     );
 
     await DatabaseHelper.instance.insertHotel(hotel);
+    toastification.show(
+        context: context, // optional if you use ToastificationWrapper
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        title: Text('Successful!'),
+        // you can also use RichText widget for title and description parameters
+        description: RichText(text: const TextSpan(text: 'Client added successfully ')),
+        alignment: Alignment.topRight,
+        direction: TextDirection.ltr,
+        animationDuration: const Duration(milliseconds: 300)
+    );
     Navigator.pop(context, true);
   }
 

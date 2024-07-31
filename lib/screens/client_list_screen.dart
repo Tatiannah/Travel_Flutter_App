@@ -3,6 +3,7 @@ import 'package:projet1/services/database_helper.dart';
 import 'package:projet1/models/client.dart';
 import 'package:projet1/screens/edit_client_screen.dart';
 import 'package:projet1/screens/add_client_screen.dart'; // Assurez-vous que ce chemin est correct
+import 'package:toastification/toastification.dart';
 
 class ClientListScreen extends StatefulWidget {
   @override
@@ -42,6 +43,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
   void _deleteClient(int id) async {
     await DatabaseHelper.instance.deleteClient(id);
+    toastification.show(
+        context: context, // optional if you use ToastificationWrapper
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        title: Text('Successful!'),
+        // you can also use RichText widget for title and description parameters
+        description: RichText(text: const TextSpan(text: 'Client deleted successfully ')),
+        alignment: Alignment.topRight,
+        direction: TextDirection.ltr,
+        animationDuration: const Duration(milliseconds: 300)
+    );
     _fetchClients();
   }
 
@@ -49,7 +62,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Client List'),
+        title: Text('Clients List'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -83,35 +96,68 @@ class _ClientListScreenState extends State<ClientListScreen> {
               itemCount: _filteredClients.length,
               itemBuilder: (context, index) {
                 final client = _filteredClients[index];
-                return ListTile(
-                  title: Text(client.nom),
-                  subtitle: Text(client.email),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditClientScreen(client: client),
-                            ),
-                          );
-                          if (result == true) {
-                            _fetchClients();
-                          }
-                        },
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Espacement autour de chaque élément
+                  elevation: 4, // Élémentation de l'ombre de la carte
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Bordures arrondies
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(
+                        client.nom.isNotEmpty ? client.nom[0].toUpperCase() : '?', // Première lettre du nom ou '?' si vide
+                        style: TextStyle(color: Colors.white),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          if (client.id != null) {
-                            _showDeleteConfirmationDialog(client.id!);
-                          }
-                        },
-                      ),
-                    ],
+                      backgroundColor: Colors.blue, // Couleur de fond de l'avatar
+                    ),
+                    title: Text(client.nom),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.email, size: 16), // Icône d'email
+                            SizedBox(width: 4), // Espacement entre l'icône et le texte
+                            Text(client.email),
+                          ],
+                        ),
+                        SizedBox(height: 4), // Espacement entre les lignes
+                        Row(
+                          children: [
+                            Icon(Icons.phone, size: 16), // Icône de téléphone
+                            SizedBox(width: 4), // Espacement entre l'icône et le texte
+                            Text(client.phone),
+                          ],
+                        ),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditClientScreen(client: client),
+                              ),
+                            );
+                            if (result == true) {
+                              _fetchClients();
+                            }
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            if (client.id != null) {
+                              _showDeleteConfirmationDialog(client.id!);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

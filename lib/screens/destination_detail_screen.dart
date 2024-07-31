@@ -3,6 +3,7 @@ import 'package:projet1/services/database_helper.dart';
 import '../models/destination.dart';
 import 'edit_destination_screen.dart';
 import 'dart:io';
+import 'package:toastification/toastification.dart';
 
 class DestinationDetailScreen extends StatelessWidget {
   final Destination destination;
@@ -107,6 +108,18 @@ class DestinationDetailScreen extends StatelessWidget {
                   // Si l'utilisateur confirme la suppression, procéder à la suppression
                   if (confirmDelete) {
                     await DatabaseHelper.instance.deleteDestination(destination.id!);
+                    toastification.show(
+                        context: context, // optional if you use ToastificationWrapper
+                        type: ToastificationType.success,
+                        style: ToastificationStyle.fillColored,
+                        autoCloseDuration: const Duration(seconds: 3),
+                        title: Text('Successful!'),
+                        // you can also use RichText widget for title and description parameters
+                        description: RichText(text: const TextSpan(text: 'Client added successfully ')),
+                        alignment: Alignment.topRight,
+                        direction: TextDirection.ltr,
+                        animationDuration: const Duration(milliseconds: 300)
+                    );
                     Navigator.pop(context, true);
                   }
                 },
