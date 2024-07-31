@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:projet1/screens/client_list_screen.dart';
+import 'package:projet1/screens/hotel_list_screen.dart';
+import 'package:projet1/screens/destination_list_screen.dart';
+import 'package:projet1/screens/reservation_list_screen.dart';
+import 'package:flutter/rendering.dart';
 
 void main() {
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
@@ -8,9 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Travel Booking App',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
       home: MainScreen(),
     );
@@ -24,10 +31,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
-    Center(child: Text('Clients Screen')),
-    Center(child: Text('Hôtels Screen')),
-    Center(child: Text('Destinations Screen')),
-    Center(child: Text('Réservations Screen')),
+    ClientListScreen(),
+    HotelList(),
+    DestinationList(),
+    ReservationList(),
   ];
 
   int _selectedIndex = 0;
@@ -41,9 +48,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Travel Booking App'),
-      ),
+        appBar: AppBar(
+          title: Center(
+            child: Text(
+              'Travel Booking App',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          backgroundColor: Colors.red,
+        ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
