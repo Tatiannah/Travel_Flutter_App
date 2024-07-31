@@ -106,7 +106,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
           lieuDestination: _isLieuDestinationChecked ? _selectedLieuDestination ?? '' : '',
           nbr_chambre: int.parse(_nbrChambreController.text),
           nbr_pers: int.parse(_nbrPersController.text),
-          typeTransport: _selectedTypeTransport ?? '',
+          type_transport: _selectedTypeTransport ?? '',
           dateArrivee: _dateArriveeController.text,
           dateDepart: _dateDepartController.text,
         );

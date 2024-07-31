@@ -38,7 +38,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     _lieuDestinationController = TextEditingController(text: widget.reservation.lieuDestination);
     _nbrChambreController = TextEditingController(text: widget.reservation.nbr_chambre.toString());
     _nbrPersController = TextEditingController(text: widget.reservation.nbr_pers.toString());
-    _typeTransportController = TextEditingController(text: widget.reservation.typeTransport);
+    _typeTransportController = TextEditingController(text: widget.reservation.type_transport);
     _dateArriveeController = TextEditingController(text: widget.reservation.dateArrivee);
     _dateDepartController = TextEditingController(text: widget.reservation.dateDepart);
 
@@ -73,7 +73,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
         lieuDestination: _lieuDestinationController.text,
         nbr_chambre: int.parse(_nbrChambreController.text),
         nbr_pers: int.parse(_nbrPersController.text),
-        typeTransport: _typeTransportController.text,
+        type_transport: _typeTransportController.text,
         dateArrivee: _dateArriveeController.text,
         dateDepart: _dateDepartController.text,
 

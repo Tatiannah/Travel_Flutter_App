@@ -8,7 +8,7 @@ class Reservation {
   String lieuDestination;
   int nbr_chambre;
   int nbr_pers;
-  String typeTransport;
+  String type_transport;
   String dateArrivee;
   String dateDepart;
 
@@ -22,7 +22,7 @@ class Reservation {
     required this.lieuDestination,
     required this.nbr_chambre,
     required this.nbr_pers,
-    required this.typeTransport,
+    required this.type_transport,
     required this.dateArrivee,
     required this.dateDepart,
   });
@@ -37,7 +37,7 @@ class Reservation {
     lieuDestination: json['lieuDestination'],
     nbr_chambre: json['nbr_chambre'],
     nbr_pers: json['nbr_pers'],
-    typeTransport: json['typeTransport'],
+    type_transport: json['type_transport'],
     dateArrivee: json['dateArrivee'],
     dateDepart: json['dateDepart'],
   );
@@ -52,7 +52,7 @@ class Reservation {
     'lieuDestination': lieuDestination,
     'nbr_chambre': nbr_chambre,
     'nbr_pers': nbr_pers,
-    'typeTransport': typeTransport,
+    'type_transport': type_transport,
     'dateArrivee': dateArrivee,
     'dateDepart': dateDepart,
   };
