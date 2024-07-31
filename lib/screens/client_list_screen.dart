@@ -96,35 +96,49 @@ class _ClientListScreenState extends State<ClientListScreen> {
               itemCount: _filteredClients.length,
               itemBuilder: (context, index) {
                 final client = _filteredClients[index];
-                return ListTile(
-                  title: Text(client.nom),
-                  subtitle: Text(client.email),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditClientScreen(client: client),
-                            ),
-                          );
-                          if (result == true) {
-                            _fetchClients();
-                          }
-                        },
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Espacement autour de chaque élément
+                  elevation: 4, // Élémentation de l'ombre de la carte
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Bordures arrondies
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(
+                        client.nom.isNotEmpty ? client.nom[0].toUpperCase() : '?', // Première lettre du nom ou '?' si vide
+                        style: TextStyle(color: Colors.white),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          if (client.id != null) {
-                            _showDeleteConfirmationDialog(client.id!);
-                          }
-                        },
-                      ),
-                    ],
+                      backgroundColor: Colors.blue, // Couleur de fond de l'avatar
+                    ),
+                    title: Text(client.nom),
+                    subtitle: Text(client.email),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditClientScreen(client: client),
+                              ),
+                            );
+                            if (result == true) {
+                              _fetchClients();
+                            }
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            if (client.id != null) {
+                              _showDeleteConfirmationDialog(client.id!);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
