@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projet1/screens/client_list_screen.dart';
 import 'package:projet1/screens/hotel_list_screen.dart';
 import 'package:projet1/screens/destination_list_screen.dart';
-
+import 'package:projet1/screens/reservation_list_screen.dart';
 void main() {
   runApp(MyApp());
 }
@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
     ClientListScreen(),
     HotelList(),
   DestinationList(),
-  //  ReservationListScreen(),
+   ReservationList(),
   ];
 
   int _selectedIndex = 0;
