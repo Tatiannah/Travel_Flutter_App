@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:projet1/services/database_helper.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class ClientChart extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _ClientChartState extends State<ClientChart> {
     _loadDestinationCount();
     _loadReservationCount();
     _fetchData();
-    _fetchDataforHotel;
+    _fetchDataforHotel();
   }
 
 
@@ -87,6 +88,25 @@ class _ClientChartState extends State<ClientChart> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(
+          Icons.mail_outline,
+          color: Colors.white,
+        ),
+        onPressed: () async {
+          // Assurez-vous d'importer le package et d'utiliser le code approprié pour envoyer un email.
+          await FlutterEmailSender.send(
+            Email(
+              body: 'I would like to request more information.',
+              recipients: ['rjamesthierry@gmail.com'],
+              subject: 'Information request',
+             /*bcc: ['info@yournews.com'],*/
+              /*cc: ['support@yournews.com'],*/
+            ),
+          );
+        },
+      ),
       body: Center(
           child: ListView(
             children: [
@@ -146,7 +166,7 @@ class _ClientChartState extends State<ClientChart> {
                 legend: Legend(isVisible: true),
                 primaryXAxis: CategoryAxis(),
                 series: <CartesianSeries>[
-                  LineSeries<ChartData, String>(
+                  BarSeries<ChartData, String>(
                     enableTooltip: true,
                     dataSource: chartData,
                     xValueMapper: (ChartData data, _) => data.x,
@@ -161,7 +181,7 @@ class _ClientChartState extends State<ClientChart> {
                 legend: Legend(isVisible: true),
                 primaryXAxis: CategoryAxis(),
                 series: <CartesianSeries>[
-                  LineSeries<ChartData, String>(
+                  BarSeries<ChartData, String>(
                     enableTooltip: true,
                     dataSource: chartDataHotel,
                     xValueMapper: (ChartData data, _) => data.x,

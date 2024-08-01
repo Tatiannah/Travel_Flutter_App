@@ -1,83 +1,451 @@
 import 'package:flutter/material.dart';
-import 'package:projet1/screens/client_list_screen.dart';
-import 'package:projet1/screens/hotel_list_screen.dart';
-import 'package:projet1/screens/destination_list_screen.dart';
-import 'package:projet1/screens/reservation_list_screen.dart';
-void main() {
-  runApp(MyApp());
+import 'package:projet1/services/database_helper.dart';
+import 'package:projet1/models/reservation.dart';
+import 'add_reservation_screen.dart';
+import 'edit_reservation_screen.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+
+class ReservationList extends StatefulWidget {
+  @override
+  _ReservationListState createState() => _ReservationListState();
 }
 
-class MyApp extends StatelessWidget {
+class _ReservationListState extends State<ReservationList> {
+  List<Reservation> _reservationList = [];
+  String? _email;
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Travel Booking App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MainScreen(),
-    );
+  void initState() {
+    super.initState();
+    _loadReservations();
   }
-}
 
-class MainScreen extends StatefulWidget {
-  @override
-  _MainScreenState createState() => _MainScreenState();
-}
+  Future<double?> GetPriceHotel(String HotelName) async {
+    final String? nameHotel = HotelName; // Assurez-vous que nomHotel n'est pas null
 
-class _MainScreenState extends State<MainScreen> {
-  final List<Widget> _pages = [
-    ClientListScreen(),
-    HotelList(),
-  DestinationList(),
-   ReservationList(),
-  ];
+    if (nameHotel == null || nameHotel.isEmpty || HotelName == null || HotelName.isEmpty) {
+      print('Hotel name cannot be null or empty');
+      return 0 ?? null;
+    }
 
-  int _selectedIndex = 0;
+    try {
+      final double price = await _searchHotelPrice(nameHotel);
+     return price;
+    } catch (e) {
+      print(e); // Affiche un message d'erreur si le prix de l'hôtel n'est pas trouvé
+    }
+  }
 
-  void _selectPage(int index) {
+  Future<double> _searchHotelPrice(String nameHotel) async {
+    final double? priceHotel = await DatabaseHelper.instance.getHotelPrice(nameHotel);
+
+    if (priceHotel == null) {
+      throw Exception('Price for hotel not found for the given hotel name');
+    }
+
+    return priceHotel;
+  }
+
+  Future<double?> GetPriceDestination(String DestinationName) async {
+    final String? nameDestination = DestinationName; // Assurez-vous que nomHotel n'est pas null
+
+    if (nameDestination == null || nameDestination.isEmpty ||DestinationName == null || DestinationName.isEmpty) {
+      print('Destination name cannot be null or empty');
+      return 0 ?? null ;
+    }
+
+    try {
+      final double price = await _searchDestinationPrice(nameDestination);
+
+      return price;
+    } catch (e) {
+      print(e); // Affiche un message d'erreur si le prix de l'hôtel n'est pas trouvé
+    }
+  }
+
+  Future<double> _searchDestinationPrice(String nameDestination) async {
+    final double? priceDestination = await DatabaseHelper.instance.getDestinationPrice(nameDestination);
+
+    if (priceDestination == null) {
+      throw Exception('Price for Destination not found for the given hotel name');
+    }
+
+
+    return priceDestination;
+  }
+
+
+  Future<String> _searchEmail(String name, String phone) async {
+    final String? email = await DatabaseHelper.instance.getEmail(name, phone);
+
+    if (email == null) {
+      throw Exception('Email not found for the given name and phone');
+    }
+
+    return email;
+  }
+
+
+  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+      final double? price = await GetPriceHotel(Content ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      final String body =price.toString();
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+
+
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel ) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+      final double? priceHotel = await GetPriceHotel(ContentHotel ?? 'None');
+      final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      String concat =  priceHotel.toString() + '' +  priceDest.toString() ;
+      final String body = concat;
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+      print(concat);
+      print(priceDest);
+      print(priceHotel);
+      print()
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination ) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+
+      final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      final String body ='' +  priceDest.toString() ;
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+
+  Future<void> sendEmailFunction({
+    required String body,
+    required List<String> recipients,
+    required String subject,
+  }) async {
+    final Email email = Email(
+      body: body,
+      recipients: recipients,
+      subject: subject,
+    );
+
+    try {
+      await FlutterEmailSender.send(email);
+    } catch (error) {
+      print('Error sending email: $error');
+    }
+  }
+
+  void _loadReservations() async {
+    final reservations = await DatabaseHelper.instance.queryAllReservations();
     setState(() {
-      _selectedIndex = index;
+      _reservationList = reservations;
     });
-    Navigator.of(context).pop(); // Close the drawer
+  }
+
+
+
+  Future<void> _confirmReservation(Reservation reservation) async {
+
+    final db = await DatabaseHelper.instance.database;
+    final hotel = await db.query(
+      'hotel',
+      where: 'nom = ? AND lieu = ?',
+      whereArgs: [reservation.nomHotel, reservation.lieuHotel],
+    );
+
+
+
+
+
+    if (hotel.isNotEmpty) {
+      final availableRooms = hotel.first['nbr_chambre_dispo'] as int;
+      if (availableRooms >= reservation.nbr_chambre) {
+        // Mettre à jour le nombre de chambres disponibles
+        await db.update(
+          'hotel',
+          {'nbr_chambre_dispo': availableRooms - reservation.nbr_chambre},
+          where: 'nom = ? AND lieu = ?',
+          whereArgs: [reservation.nomHotel, reservation.lieuHotel],
+        );
+        // Mettre à jour l'état de la réservation
+        await db.update(
+          'reservation',
+          {'isConfirmed': 1},
+          where: 'id = ?',
+          whereArgs: [reservation.id],
+        );
+        print('Réservation confirmée pour ${reservation.nom}');
+
+
+
+        sendEmailHotel(reservation.nom, reservation.phone , reservation.nomHotel);
+
+      } else {
+        print('Pas assez de chambres disponibles');
+      }
+    } else {
+      print('Hôtel non trouvé');
+    }
+    // Vérifiez les disponibilités de la destination
+    final destination = await db.query(
+      'destination',
+      where: 'nom = ? AND lieu = ?',
+      whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+    );
+
+    if (destination.isNotEmpty) {
+      final availablePeople = destination.first['nbr_pers_dispo'] as int;
+      if (availablePeople >= reservation.nbr_pers) {
+        // Mettre à jour le nombre de personnes disponibles dans la destination
+        await db.update(
+          'destination',
+          {'nbr_pers_dispo': availablePeople - reservation.nbr_pers},
+          where: 'nom = ? AND lieu = ?',
+          whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+        );
+        // Mettre à jour l'état de la réservation
+        await db.update(
+          'reservation',
+          {'isConfirmed': 1},
+          where: 'id = ?',
+          whereArgs: [reservation.id],
+        );
+        print('Réservation confirmée pour ${reservation.nom}');
+
+        print(reservation.nomDestination  );
+        print(reservation.phone  );
+        print(reservation.nom  );
+
+        sendEmailDestination(reservation.nom, reservation.phone , reservation.nomDestination);
+      } else {
+        print('Pas assez de personnes disponibles dans la destination');
+      }
+    } else {
+      print('Destination non trouvée');
+    }
+
+    print("miditr amle samy miy value izy roa isika ");
+
+
+    if(destination.isNotEmpty && hotel.isNotEmpty){
+      sendEmailDestinationHotel(reservation.nom, reservation.phone, reservation.nomDestination, reservation.nomHotel);
+    }
+
+
+
+
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Travel Booking App'),
+        title: Text('Liste des Réservations'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Menu'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+      body: _reservationList.isEmpty
+          ? Center(child: Text('Aucune réservation trouvée'))
+          : SingleChildScrollView(
+        child: Column(
+          children: _reservationList.map((reservation) {
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-            ),
-            ListTile(
-              title: Text('Clients'),
-              onTap: () => _selectPage(0),
-            ),
-            ListTile(
-              title: Text('Hôtels'),
-              onTap: () => _selectPage(1),
-            ),
-            ListTile(
-              title: Text('Destinations'),
-              onTap: () => _selectPage(2),
-            ),
-            ListTile(
-              title: Text('Réservations'),
-              onTap: () => _selectPage(3),
-            ),
-          ],
+              child: ListTile(
+                contentPadding: EdgeInsets.all(16),
+                leading: Icon(Icons.hotel, size: 40, color: Colors.blue),
+                title: Text(
+                  reservation.nom,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Hôtel: ${reservation.nomHotel}'),
+                    Text('Destination: ${reservation.nomDestination}'),
+                    SizedBox(height: 8),
+                    Text(
+                      'Dates: ${reservation.dateArrivee} - ${reservation.dateDepart}',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Chip(
+                            label: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.bed, size: 16, color: Colors.orange),
+                                SizedBox(width: 4),
+                                Text('${reservation.nbr_chambre}'),
+                              ],
+                            ),
+                            backgroundColor: Colors.orange[100],
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Chip(
+                            label: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.person, size: 16, color: Colors.green),
+                                SizedBox(width: 4),
+                                Text('${reservation.nbr_pers}'),
+                              ],
+                            ),
+                            backgroundColor: Colors.green[100],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (reservation.isConfirmed)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'La réservation est confirmée',
+                          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                  ],
+                ),
+                isThreeLine: true,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditReservationScreen(reservation: reservation),
+                    ),
+                  ).then((_) => _loadReservations()); // Reload reservations on return
+                },
+                trailing: reservation.isConfirmed
+                    ? SizedBox.shrink() // Hide trailing icons if confirmed
+                    : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.check, color: Colors.green),
+                      onPressed: () async {
+                        final confirm = await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Confirmer la Réservation'),
+                            content: Text('Êtes-vous sûr de vouloir confirmer cette réservation?'),
+                            actions: [
+                              TextButton(
+                                child: Text('Annuler'),
+                                onPressed: () => Navigator.of(context).pop(false),
+                              ),
+                              TextButton(
+                                child: Text('Confirmer'),
+                                onPressed: () => Navigator.of(context).pop(true),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await _confirmReservation(reservation);
+                          _loadReservations();
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Supprimer la Réservation'),
+                            content: Text('Êtes-vous sûr de vouloir supprimer cette réservation?'),
+                            actions: [
+                              TextButton(
+                                child: Text('Annuler'),
+                                onPressed: () => Navigator.of(context).pop(false),
+                              ),
+                              TextButton(
+                                child: Text('Supprimer'),
+                                onPressed: () => Navigator.of(context).pop(true),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          if (reservation.id != null) {
+                            await DatabaseHelper.instance.deleteReservation(reservation.id!);
+                            _loadReservations();
+                          } else {
+                            print('Erreur : ID de réservation nul');
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
-      body: _pages[_selectedIndex],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddReservationScreen()),
+          );
+          if (result == 'refresh') {
+            _loadReservations();
+          }
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

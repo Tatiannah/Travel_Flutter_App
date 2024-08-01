@@ -3,6 +3,7 @@ import 'package:projet1/services/database_helper.dart';
 import 'package:projet1/models/reservation.dart';
 import 'add_reservation_screen.dart';
 import 'edit_reservation_screen.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class ReservationList extends StatefulWidget {
   @override
@@ -11,11 +12,169 @@ class ReservationList extends StatefulWidget {
 
 class _ReservationListState extends State<ReservationList> {
   List<Reservation> _reservationList = [];
+  String? _email;
 
   @override
   void initState() {
     super.initState();
     _loadReservations();
+  }
+
+  Future<double?> GetPriceHotel(String HotelName) async {
+    final String? nameHotel = HotelName; // Assurez-vous que nomHotel n'est pas null
+
+    if (nameHotel == null || nameHotel.isEmpty || HotelName == null || HotelName.isEmpty) {
+      print('Hotel name cannot be null or empty');
+      return 0 ?? null;
+    }
+
+    try {
+      final double price = await _searchHotelPrice(nameHotel);
+     return price;
+    } catch (e) {
+      print(e); // Affiche un message d'erreur si le prix de l'hôtel n'est pas trouvé
+    }
+  }
+
+  Future<double> _searchHotelPrice(String nameHotel) async {
+    final double? priceHotel = await DatabaseHelper.instance.getHotelPrice(nameHotel);
+
+    if (priceHotel == null) {
+      throw Exception('Price for hotel not found for the given hotel name');
+    }
+
+    return priceHotel;
+  }
+
+  Future<double?> GetPriceDestination(String DestinationName) async {
+    final String? nameDestination = DestinationName; // Assurez-vous que nomHotel n'est pas null
+
+    if (nameDestination == null || nameDestination.isEmpty ||DestinationName == null || DestinationName.isEmpty) {
+      print('Destination name cannot be null or empty');
+      return 0 ?? null ;
+    }
+
+    try {
+      final double price = await _searchDestinationPrice(nameDestination);
+
+      return price;
+    } catch (e) {
+      print(e); // Affiche un message d'erreur si le prix de l'hôtel n'est pas trouvé
+    }
+  }
+
+  Future<double> _searchDestinationPrice(String nameDestination) async {
+    final double? priceDestination = await DatabaseHelper.instance.getDestinationPrice(nameDestination);
+
+    if (priceDestination == null) {
+      throw Exception('Price for Destination not found for the given hotel name');
+    }
+
+
+    return priceDestination;
+  }
+
+
+  Future<String> _searchEmail(String name, String phone) async {
+    final String? email = await DatabaseHelper.instance.getEmail(name, phone);
+
+    if (email == null) {
+      throw Exception('Email not found for the given name and phone');
+    }
+
+    return email;
+  }
+
+
+  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+      final double? price = await GetPriceHotel(Content ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      final String body =price.toString();
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+
+
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel ) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+      final double? priceHotel = await GetPriceHotel(ContentHotel ?? 'None');
+      final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      String concat =  priceHotel.toString() + '' +  priceDest.toString() ;
+      final String body = concat;
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+      print(concat);
+      print(priceDest);
+      print(priceHotel);
+      print(mailSender);
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination ) async {
+    final String name = nameX;
+    final String phone = phoneX ;
+
+    try {
+
+      final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
+      final String mailSender = await _searchEmail(name, phone);
+      final String body ='' +  priceDest.toString() ;
+      final String subject = "hello world";
+      final List<String> recipients = [mailSender];
+
+      await sendEmailFunction(
+        body: body,
+        recipients: recipients,
+        subject: subject,
+      );
+    } catch (e) {
+      print(e); // Vous pouvez afficher une alerte ou un message d'erreur ici
+    }
+  }
+
+
+  Future<void> sendEmailFunction({
+    required String body,
+    required List<String> recipients,
+    required String subject,
+  }) async {
+    final Email email = Email(
+      body: body,
+      recipients: recipients,
+      subject: subject,
+    );
+
+    try {
+      await FlutterEmailSender.send(email);
+    } catch (error) {
+      print('Error sending email: $error');
+    }
   }
 
   void _loadReservations() async {
@@ -25,55 +184,46 @@ class _ReservationListState extends State<ReservationList> {
     });
   }
 
-  Future<void> _confirmReservation(Reservation reservation) async {
-    final db = await DatabaseHelper.instance.database;
-    final hotel = await db.query(
-      'hotel',
-      where: 'nom = ? AND lieu = ?',
-      whereArgs: [reservation.nomHotel, reservation.lieuHotel],
-    );
 
-    if (hotel.isNotEmpty) {
-      final availableRooms = hotel.first['nbr_chambre_dispo'] as int;
-      if (availableRooms >= reservation.nbr_chambre) {
-        // Mettre à jour le nombre de chambres disponibles
+  Future<void> _confirmReservation(Reservation reservation) async {
+    try {
+      final db = await DatabaseHelper.instance.database;
+      // Vérifiez les disponibilités de l'hôtel
+      final hotel = await db.query(
+        'hotel',
+        where: 'nom = ? AND lieu = ?',
+        whereArgs: [reservation.nomHotel, reservation.lieuHotel],
+      );
+
+      final bool hotelAvailable = hotel.isNotEmpty &&
+          (hotel.first['nbr_chambre_dispo'] as int) >= reservation.nbr_chambre;
+
+      // Vérifiez les disponibilités de la destination
+      final destination = await db.query(
+        'destination',
+        where: 'nom = ? AND lieu = ?',
+        whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+      );
+
+      final bool destinationAvailable = destination.isNotEmpty &&
+          (destination.first['nbr_pers_dispo'] as int) >= reservation.nbr_pers;
+
+      // Vérifiez les deux conditions et mettez à jour les données si disponibles
+      if (hotelAvailable && destinationAvailable) {
         await db.update(
           'hotel',
-          {'nbr_chambre_dispo': availableRooms - reservation.nbr_chambre},
+          {'nbr_chambre_dispo': (hotel.first['nbr_chambre_dispo'] as int) - reservation.nbr_chambre},
           where: 'nom = ? AND lieu = ?',
           whereArgs: [reservation.nomHotel, reservation.lieuHotel],
         );
-        // Mettre à jour l'état de la réservation
-        await db.update(
-          'reservation',
-          {'isConfirmed': 1},
-          where: 'id = ?',
-          whereArgs: [reservation.id],
-        );
-        print('Réservation confirmée pour ${reservation.nom}');
-      } else {
-        print('Pas assez de chambres disponibles');
-      }
-    } else {
-      print('Hôtel non trouvé');
-    }
-    // Vérifiez les disponibilités de la destination
-    final destination = await db.query(
-      'destination',
-      where: 'nom = ? AND lieu = ?',
-      whereArgs: [reservation.nomDestination, reservation.lieuDestination],
-    );
 
-    if (destination.isNotEmpty) {
-      final availablePeople = destination.first['nbr_pers_dispo'] as int;
-      if (availablePeople >= reservation.nbr_pers) {
-        // Mettre à jour le nombre de personnes disponibles dans la destination
         await db.update(
           'destination',
-          {'nbr_pers_dispo': availablePeople - reservation.nbr_pers},
+          {'nbr_pers_dispo': (destination.first['nbr_pers_dispo'] as int) - reservation.nbr_pers},
           where: 'nom = ? AND lieu = ?',
           whereArgs: [reservation.nomDestination, reservation.lieuDestination],
         );
+
         // Mettre à jour l'état de la réservation
         await db.update(
           'reservation',
@@ -81,14 +231,77 @@ class _ReservationListState extends State<ReservationList> {
           where: 'id = ?',
           whereArgs: [reservation.id],
         );
+
         print('Réservation confirmée pour ${reservation.nom}');
+
+        // Envoyer un email pour la confirmation de l'hôtel et de la destination
+        sendEmailDestinationHotel(
+            reservation.nom,
+            reservation.phone,
+            reservation.nomDestination,
+            reservation.nomHotel
+        );
       } else {
-        print('Pas assez de personnes disponibles dans la destination');
+        // Si l'une ou l'autre des conditions échoue, afficher les messages appropriés
+        if (!hotelAvailable && !destinationAvailable) {
+          print('Hôtel et destination non trouvés ou pas assez de disponibilités.');
+        } else if (!hotelAvailable) {
+          print('Hôtel non trouvé ou pas assez de chambres disponibles.');
+        } else if (!destinationAvailable) {
+          print('Destination non trouvée ou pas assez de personnes disponibles.');
+        }
+
+        // Envoyer des emails en fonction de la disponibilité
+        if (hotelAvailable) {
+          await db.update(
+            'hotel',
+            {'nbr_chambre_dispo': (hotel.first['nbr_chambre_dispo'] as int) - reservation.nbr_chambre},
+            where: 'nom = ? AND lieu = ?',
+            whereArgs: [reservation.nomHotel, reservation.lieuHotel],
+          );
+
+          await db.update(
+            'reservation',
+            {'isConfirmed': 1},
+            where: 'id = ?',
+            whereArgs: [reservation.id],
+          );
+
+          sendEmailHotel(
+              reservation.nom,
+              reservation.phone,
+              reservation.nomHotel
+          );
+        }
+
+        if (destinationAvailable) {
+
+          await db.update(
+            'destination',
+            {'nbr_pers_dispo': (destination.first['nbr_pers_dispo'] as int) - reservation.nbr_pers},
+            where: 'nom = ? AND lieu = ?',
+            whereArgs: [reservation.nomDestination, reservation.lieuDestination],
+          );
+
+          await db.update(
+            'reservation',
+            {'isConfirmed': 1},
+            where: 'id = ?',
+            whereArgs: [reservation.id],
+          );
+
+          sendEmailDestination(
+              reservation.nom,
+              reservation.phone,
+              reservation.nomDestination
+          );
+        }
       }
-    } else {
-      print('Destination non trouvée');
+    } catch (e) {
+      print('Erreur lors de la confirmation de la réservation: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

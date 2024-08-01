@@ -299,15 +299,17 @@ class DatabaseHelper {
     final db = await instance.database;
 
     final result = await db.rawQuery('''
-      SELECT lieuDestination, COUNT(nom) as count
-      FROM reservation
-      GROUP BY lieuDestination
-    ''');
+    SELECT lieuDestination, COUNT(nom) as count
+    FROM reservation
+    GROUP BY lieuDestination
+  ''');
 
     return {
-      for (var row in result) row['lieuDestination'] as String: row['count'] as int
+      for (var row in result)
+        if (row['lieuDestination'] != null) row['lieuDestination'] as String: row['count'] as int
     };
   }
+
 
   FutureOr<Map<String, int>> getReservationsCountByHotel() async {
     final db = await instance.database;
@@ -319,8 +321,61 @@ class DatabaseHelper {
     ''');
 
     return {
-      for (var row in result) row['lieuHotel'] as String: row['count'] as int
+      for (var row in result)
+        if (row['lieuHotel'] != null) row['lieuHotel'] as String: row['count'] as int
     };
+  }
+
+  Future<String?> getEmail(String name, String phone) async {
+    final db = await instance.database;
+
+    final result = await db.query(
+      'client',
+      columns: ['email'],
+      where: 'nom = ? AND phone = ?',
+      whereArgs: [name, phone],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['email'] as String?;
+    } else {
+      return null;
+    }
+  }
+
+  Future<double?> getHotelPrice(String nameHotel) async {
+    final db = await instance.database;
+
+    final result = await db.query(
+      'hotel',
+      columns: ['prix'],
+      where: 'nom = ? ',
+      whereArgs: [nameHotel],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['prix'] as double?;
+    } else {
+      return null;
+    }
+  }
+
+  Future<double?> getDestinationPrice(String nameDestination) async {
+    final db = await instance.database;
+
+    final result = await db.query(
+      'destination',
+      columns: ['prix'],
+      where: 'nom = ? ',
+      whereArgs: [nameDestination]
+    );
+
+    if (result.isNotEmpty) {
+      print(result);
+      return result.first['prix'] as double?;
+    } else {
+      return null;
+    }
   }
 
 }

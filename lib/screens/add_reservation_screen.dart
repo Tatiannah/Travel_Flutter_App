@@ -17,6 +17,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
   String? _selectedNomDestination;
   String? _selectedTypeTransport;
 
+
   // Controllers
   late TextEditingController _nomController;
   late TextEditingController _phoneController;
@@ -52,6 +53,8 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
     _dateDepartController.dispose();
     super.dispose();
   }
+
+
 
   Future<void> _loadLieux() async {
     final hotelLieux = await DatabaseHelper.instance.queryHotelLieux();
@@ -92,6 +95,9 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
       });
     }
   }
+
+
+
 
   void _addReservation() async {
     if (_formKey.currentState!.validate()) {
@@ -348,6 +354,8 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                   ),
                 ],
               ),
+
+
             ],
           ),
         ),
