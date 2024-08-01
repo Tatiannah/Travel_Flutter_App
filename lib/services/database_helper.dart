@@ -79,7 +79,7 @@ class DatabaseHelper {
         lieuDestination TEXT,
         nbr_chambre INTEGER DEFAULT 0 CHECK(nbr_chambre >= 0),
         nbr_pers INTEGER DEFAULT 0 CHECK(nbr_pers >= 0),
-        type_transport TEXT CHECK(type_transport IN ('avion', 'train', 'voiture')),
+        type_transport TEXT CHECK(type_transport IN ('Plane', 'Train', 'Car')),
         dateArrivee DATE NOT NULL,
         dateDepart DATE NOT NULL,
         isConfirmed INTEGER DEFAULT 0, -- Nouvelle colonne ajoutée

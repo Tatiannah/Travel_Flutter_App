@@ -18,6 +18,8 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
   final _lieuController = TextEditingController();
   final _prixController = TextEditingController();
   File? _image;
+  String? _selectedTypeTransport;
+
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -35,7 +37,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
     final lieu = _lieuController.text;
     final image = _image?.path ?? '';
 
-    if (nom.isEmpty || description.isEmpty || lieu.isEmpty || type_transport.isEmpty || _prixController.text.isEmpty || _nbrPersDispoController.text.isEmpty) {
+    if (nom.isEmpty || description.isEmpty || lieu.isEmpty  || _prixController.text.isEmpty || _nbrPersDispoController.text.isEmpty) {
       _showErrorDialog('All fields must be completed');
       return;
     }
@@ -54,7 +56,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
       nom: nom,
       description: description,
       nbr_pers_dispo: nbrPersDispo,
-      type_transport: type_transport,
+      type_transport: _selectedTypeTransport.toString(),
       image: image,
       lieu: lieu,
       prix: prix,
@@ -65,7 +67,7 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
       context: context,
       type: ToastificationType.success,
       style: ToastificationStyle.fillColored,
-      autoCloseDuration: const Duration(seconds: 3),
+      autoCloseDuration: const Duration(seconds: 1),
       title: Text('Successful!'),
       description: RichText(text: const TextSpan(text: 'Destination added successfully')),
       alignment: Alignment.topRight,
@@ -117,10 +119,22 @@ class _AddDestinationScreenState extends State<AddDestinationScreen> {
                 keyboardType: TextInputType.number,
               ),
 
-              TextField(
-                controller: _typeTransportController,
-                decoration: InputDecoration(labelText: 'Transport_type'),
+              DropdownButtonFormField<String?>(
+                value: _selectedTypeTransport,
+                hint: Text('Transport_Type'),
+                items: ['Plan', 'Train', 'Car'].map((type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedTypeTransport = newValue;
+                  });
+                },
               ),
+
 
               TextField(
                 controller: _lieuController,

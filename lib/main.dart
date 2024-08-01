@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     _animationController.dispose();
     super.dispose();
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     _fetchUnconfirmedCount();
     _updateNotificationCount();
 
-    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       _updateNotificationCount();
     });
   }

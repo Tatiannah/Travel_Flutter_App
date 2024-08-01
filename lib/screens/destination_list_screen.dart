@@ -49,7 +49,15 @@ class _DestinationListState extends State<DestinationList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Destinations List')),
+      appBar:  AppBar(
+        title: Text('Destinations List',
+        style: TextStyle(
+          fontWeight: FontWeight.bold, // Texte en gras
+          fontSize: 25.0,
+          // Taille de la police
+        )),
+    centerTitle: true, // Centre le titre dans l'AppBar
+    ),
       body: SingleChildScrollView(
         child: Column(
           children: [

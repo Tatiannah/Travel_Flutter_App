@@ -379,7 +379,13 @@ class _ReservationListState extends State<ReservationList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des Réservations'),
+        title: Text('Reservations List',
+            style: TextStyle(
+              fontWeight: FontWeight.bold, // Texte en gras
+              fontSize: 25.0,
+              // Taille de la police
+            )),
+        centerTitle: true, // Centre le titre dans l'AppBar
       ),
       body: _reservationList.isEmpty
           ? Center(child: Text('Aucune réservation trouvée'))

@@ -23,13 +23,14 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
   late TextEditingController _lieuController;
   late TextEditingController _prixController;
   File? _image;
+  String? _selectedTypeTransport ;
 
   @override
   void initState() {
     super.initState();
     _nomController = TextEditingController(text: widget.destination.nom);
     _descriptionController = TextEditingController(text: widget.destination.description);
-    _typeTransportController = TextEditingController(text: widget.destination.type_transport);
+    _selectedTypeTransport = widget.destination.type_transport;
     _lieuController = TextEditingController(text: widget.destination.lieu);
     _prixController = TextEditingController(text: widget.destination.prix.toString());
     _nbrPersDispoController = TextEditingController(text: widget.destination.nbr_pers_dispo.toString());
@@ -54,7 +55,7 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
         id: widget.destination.id,
         nom: _nomController.text,
         description: _descriptionController.text,
-        type_transport: _typeTransportController.text,
+        type_transport: _selectedTypeTransport.toString(),
         image: _image != null ? _image!.path : widget.destination.image,
         lieu: _lieuController.text,
         prix: double.parse(_prixController.text),
@@ -65,9 +66,9 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
         context: context,
         type: ToastificationType.success,
         style: ToastificationStyle.fillColored,
-        autoCloseDuration: const Duration(seconds: 3),
+        autoCloseDuration: const Duration(seconds: 1),
         title: Text('Successful!'),
-        description: RichText(text: const TextSpan(text: 'Destination edited successfully')),
+        description: RichText(text: const TextSpan(text: 'Destination Informations edited successfully')),
         alignment: Alignment.topRight,
         direction: TextDirection.ltr,
         animationDuration: const Duration(milliseconds: 300),
@@ -120,17 +121,22 @@ class _EditDestinationScreenState extends State<EditDestinationScreen> {
                   },
                 ),
 
-                TextFormField(
-                  controller: _typeTransportController,
-                  decoration: InputDecoration(labelText: 'Transport_Type'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the type of Transport';
-                    }
-                    return null;
+                DropdownButtonFormField<String>(
+                  value: _selectedTypeTransport,
+                  hint: Text('Transport_Type'),
+                  items: ['Plan', 'Train', 'Car'].map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedTypeTransport = value ;
+                    });
                   },
                 ),
+
                 TextFormField(
                   controller: _lieuController,
                   decoration: InputDecoration(labelText: 'Place'),

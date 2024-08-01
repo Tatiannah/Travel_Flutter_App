@@ -26,6 +26,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
   late TextEditingController _typeTransportController;
   late TextEditingController _dateArriveeController;
   late TextEditingController _dateDepartController;
+  String? _selectedTypeTransport;
 
   @override
   void initState() {
@@ -38,7 +39,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
     _lieuDestinationController = TextEditingController(text: widget.reservation.lieuDestination);
     _nbrChambreController = TextEditingController(text: widget.reservation.nbr_chambre.toString());
     _nbrPersController = TextEditingController(text: widget.reservation.nbr_pers.toString());
-    _typeTransportController = TextEditingController(text: widget.reservation.type_transport);
+    _selectedTypeTransport = widget.reservation.type_transport;
     _dateArriveeController = TextEditingController(text: widget.reservation.dateArrivee);
     _dateDepartController = TextEditingController(text: widget.reservation.dateDepart);
   }
@@ -86,7 +87,7 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
         lieuDestination: _lieuDestinationController.text,
         nbr_chambre: int.parse(_nbrChambreController.text),
         nbr_pers: int.parse(_nbrPersController.text),
-        type_transport: _typeTransportController.text,
+        type_transport: _selectedTypeTransport.toString(),
         dateArrivee: _dateArriveeController.text,
         dateDepart: _dateDepartController.text,
       );
@@ -97,10 +98,10 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
           context: context, // optional if you use ToastificationWrapper
           type: ToastificationType.success,
           style: ToastificationStyle.fillColored,
-          autoCloseDuration: const Duration(seconds: 3),
+          autoCloseDuration: const Duration(seconds: 1),
           title: Text('Successful!'),
           // you can also use RichText widget for title and description parameters
-          description: RichText(text: const TextSpan(text: 'Client added successfully ')),
+          description: RichText(text: const TextSpan(text: 'Reservation Informations edited successfully ')),
           alignment: Alignment.topRight,
           direction: TextDirection.ltr,
           animationDuration: const Duration(milliseconds: 300)
@@ -203,14 +204,19 @@ class _EditReservationScreenState extends State<EditReservationScreen> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _typeTransportController,
-                decoration: InputDecoration(labelText: 'Type de Transport'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le type de transport';
-                  }
-                  return null;
+              DropdownButtonFormField<String>(
+                value: _selectedTypeTransport,
+                hint: Text('Transport_Type'),
+                items: ['Plan', 'Train', 'Car'].map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    _selectedTypeTransport = value ;
+                  });
                 },
               ),
               GestureDetector(

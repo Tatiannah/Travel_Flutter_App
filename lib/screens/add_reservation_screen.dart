@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet1/services/database_helper.dart';
 import 'package:projet1/models/reservation.dart';
+import 'package:toastification/toastification.dart';
 
 class AddReservationScreen extends StatefulWidget {
   @override
@@ -119,15 +120,27 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
         print('Réservation à ajouter : ${reservation.toMap()}'); // Débogage
 
         await DatabaseHelper.instance.insertReservation(reservation);
+        toastification.show(
+            context: context, // optional if you use ToastificationWrapper
+            type: ToastificationType.success,
+            style: ToastificationStyle.fillColored,
+            autoCloseDuration: const Duration(seconds: 1),
+            title: Text('Successful!'),
+            // you can also use RichText widget for title and description parameters
+            description: RichText(text: const TextSpan(text: 'Reservation added successfully ')),
+            alignment: Alignment.topRight,
+            direction: TextDirection.ltr,
+            animationDuration: const Duration(milliseconds: 300)
+        );
 
         Navigator.pop(context, 'refresh');
       } catch (e) {
-        print('Erreur : $e'); // Débogage
+        print('Error : $e'); // Débogage
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Erreur'),
-            content: Text('Une erreur est survenue : $e'),
+            title: Text('ErrOR'),
+            content: Text('An error is occured : $e'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -148,7 +161,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ajouter une Réservation'),
+        title: Text('Add Reservation'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -158,26 +171,26 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
             children: [
               TextFormField(
                 controller: _nomController,
-                decoration: InputDecoration(labelText: 'Nom'),
+                decoration: InputDecoration(labelText: 'Full name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le nom';
+                    return 'Please enter full name ';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Téléphone'),
+                decoration: InputDecoration(labelText: 'Phone Number'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le numéro de téléphone';
+                    return 'Please enter phone number';
                   }
                   return null;
                 },
               ),
               CheckboxListTile(
-                title: Text('Lieu Hôtel'),
+                title: Text('Hotel Location'),
                 value: _isLieuHotelChecked,
                 onChanged: (bool? value) {
                   setState(() {
@@ -195,7 +208,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
               if (_isLieuHotelChecked) ...[
                 DropdownButtonFormField<String>(
                   value: _selectedLieuHotel,
-                  hint: Text('Sélectionner le lieu de l\'hôtel'),
+                  hint: Text('Choose Hotel Location'),
                   items: _hotelLieux.map((lieu) {
                     return DropdownMenuItem(
                       value: lieu,
@@ -211,14 +224,14 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                 ),
                 DropdownButtonFormField<String>(
                   value: _selectedNomHotel,
-                  hint: Text('Sélectionner le nom de l\'hôtel'),
+                  hint: Text('Choose the name of the hotel'),
                   items: _hotelNoms.map((nom) {
                     return DropdownMenuItem(
                       value: nom,
                       child: Text(nom),
                     );
                   }).toList(),
-                  onChanged: (value) {
+                  onChanged: (String? value) {
                     setState(() {
                       _selectedNomHotel = value;
                     });
@@ -226,18 +239,18 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                 ),
                 TextFormField(
                   controller: _nbrChambreController,
-                  decoration: InputDecoration(labelText: 'Nombre de Chambres'),
+                  decoration: InputDecoration(labelText: 'Numbers of rooms to reserve'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nombre de chambres';
+                      return 'Please enter number of rooms to reserve';
                     }
                     return null;
                   },
                 ),
               ],
               CheckboxListTile(
-                title: Text('Lieu Destination'),
+                title: Text('Destination Location'),
                 value: _isLieuDestinationChecked,
                 onChanged: (bool? value) {
                   setState(() {
@@ -255,7 +268,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
               if (_isLieuDestinationChecked) ...[
                 DropdownButtonFormField<String>(
                   value: _selectedLieuDestination,
-                  hint: Text('Sélectionner le lieu de la destination'),
+                  hint: Text('Choose Destination Location'),
                   items: _destinationLieux.map((lieu) {
                     return DropdownMenuItem(
                       value: lieu,
@@ -271,7 +284,7 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                 ),
                 DropdownButtonFormField<String>(
                   value: _selectedNomDestination,
-                  hint: Text('Sélectionner le nom de la destination'),
+                  hint: Text('Choose the name of destination'),
                   items: _destinationNoms.map((nom) {
                     return DropdownMenuItem(
                       value: nom,
@@ -286,25 +299,25 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                 ),
                 TextFormField(
                   controller: _nbrPersController,
-                  decoration: InputDecoration(labelText: 'Nombre de Personnes'),
+                  decoration: InputDecoration(labelText: 'Numbers of people who will travel '),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nombre de personnes';
+                      return 'enter the number of people who will travel';
                     }
                     return null;
                   },
                 ),
                 DropdownButtonFormField<String>(
                   value: _selectedTypeTransport,
-                  hint: Text('Type de Transport'),
-                  items: ['avion', 'train', 'voiture'].map((type) {
+                  hint: Text('Transport_Type'),
+                  items: ['Plan', 'Train', 'Car'].map((type) {
                     return DropdownMenuItem(
                       value: type,
                       child: Text(type),
                     );
                   }).toList(),
-                  onChanged: (value) {
+                  onChanged: (String? value) {
                     setState(() {
                       _selectedTypeTransport = value;
                     });
@@ -313,24 +326,24 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
               ],
               TextFormField(
                 controller: _dateArriveeController,
-                decoration: InputDecoration(labelText: 'Date d\'Arrivée'),
+                decoration: InputDecoration(labelText: 'Arrival Date'),
                 readOnly: true,
                 onTap: () => _selectDate(_dateArriveeController),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer la date d\'arrivée';
+                    return 'Please enter the arrival date';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _dateDepartController,
-                decoration: InputDecoration(labelText: 'Date de Départ'),
+                decoration: InputDecoration(labelText: 'Departure Date'),
                 readOnly: true,
                 onTap: () => _selectDate(_dateDepartController),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer la date de départ';
+                    return 'Please enter the departure Date';
                   }
                   return null;
                 },
@@ -340,17 +353,17 @@ class _AddReservationScreenState extends State<AddReservationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton(
-                    onPressed: _addReservation,
-                    child: Text('Ajouter'),
-                  ),
-                  ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('Annuler'),
+                    child: Text('Cancel'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _addReservation,
+                    child: Text('Add'),
                   ),
                 ],
               ),

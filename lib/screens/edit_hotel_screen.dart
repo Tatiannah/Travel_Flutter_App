@@ -64,10 +64,10 @@ class _EditHotelScreenState extends State<EditHotelScreen> {
           context: context, // optional if you use ToastificationWrapper
           type: ToastificationType.success,
           style: ToastificationStyle.fillColored,
-          autoCloseDuration: const Duration(seconds: 3),
+          autoCloseDuration: const Duration(seconds: 1),
           title: Text('Successful!'),
           // you can also use RichText widget for title and description parameters
-          description: RichText(text: const TextSpan(text: 'Hotel added successfully ')),
+          description: RichText(text: const TextSpan(text: 'Hotel Informations edited successfully ')),
           alignment: Alignment.topRight,
           direction: TextDirection.ltr,
           animationDuration: const Duration(milliseconds: 300)
