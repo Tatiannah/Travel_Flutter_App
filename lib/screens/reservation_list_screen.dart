@@ -4,6 +4,7 @@ import 'package:projet1/models/reservation.dart';
 import 'add_reservation_screen.dart';
 import 'edit_reservation_screen.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'dart:math';
 
 class ReservationList extends StatefulWidget {
   @override
@@ -86,9 +87,16 @@ class _ReservationListState extends State<ReservationList> {
   }
 
 
-  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content , int nbrooms ) async {
+  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content , int nbrooms , String nomReceveur , String date , String Lieu ) async {
     final String name = nameX;
     final String phone = phoneX ;
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final Random random = Random();
+    final StringBuffer sb = StringBuffer();
+
+    for (int i = 0; i < 5 ; i++) {
+      sb.write(chars[random.nextInt(chars.length)]);
+    }
 
     try {
       final double? price = await GetPriceHotel(Content ?? 'None');
@@ -98,9 +106,10 @@ class _ReservationListState extends State<ReservationList> {
         throw Exception('Price not found');
       }
 
-      final String body = (price * nbrooms).toString();
+      final String body ="Description du Voyage :" + "\n" + (price * nbrooms).toString() + "MGA"+"\n"
+          + "Date de voyage :"+date + "\n" +"Lieu : "+Lieu+ "";
 
-      final String subject = "hello world";
+      final String subject = "Facture attribué à : " +nomReceveur + "portant sur la facture N° : "  + sb.toString();
       final List<String> recipients = [mailSender];
 
 
@@ -115,9 +124,16 @@ class _ReservationListState extends State<ReservationList> {
     }
   }
 
-  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel,int nbpers , int nbrooms ) async {
+  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel,int nbpers , int nbrooms , String nomReceveur,String date , String Lieu) async {
     final String name = nameX;
     final String phone = phoneX ;
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final Random random = Random();
+    final StringBuffer sb = StringBuffer();
+
+    for (int i = 0; i < 5 ; i++) {
+      sb.write(chars[random.nextInt(chars.length)]);
+    }
 
     try {
       final double? priceHotel = await GetPriceHotel(ContentHotel ?? 'None');
@@ -135,8 +151,9 @@ class _ReservationListState extends State<ReservationList> {
       }
 
       String concat =  ((priceHotel*nbrooms)+ (priceDest*nbpers)).toString() ;
-      final String body = concat;
-      final String subject = "hello world";
+      final String body = "Description du Voyage :" + "\n" + "Montant Total : "+concat  + " MGA"+"\n"
+          + "Date de Voyage :"+ date + "\n" +"Lieu : "+ Lieu;
+      final String subject = "Facture attribué à : " + nomReceveur + "portant sur la facture N° : "  + sb.toString();;
       final List<String> recipients = [mailSender];
 
       print(concat);
@@ -153,9 +170,16 @@ class _ReservationListState extends State<ReservationList> {
     }
   }
 
-  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination , int nbpers) async {
+  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination , int nbpers , String nomReceveur , String date , String Lieu ) async {
     final String name = nameX;
     final String phone = phoneX ;
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final Random random = Random();
+    final StringBuffer sb = StringBuffer();
+
+    for (int i = 0; i < 5 ; i++) {
+      sb.write(chars[random.nextInt(chars.length)]);
+    }
 
     try {
 
@@ -166,9 +190,10 @@ class _ReservationListState extends State<ReservationList> {
         throw Exception('Price not found');
       }
 
-      final String body = (priceDest * nbpers).toString();
+      final String body = "Descritpion du Voyage " +"\n" +"Montant Total : " +  (priceDest * nbpers).toString() + " MGA" + "\n"
+                    + "Date de Voyage  :"+date + "\n" +"Lieu : "+  Lieu;
 
-      final String subject = "hello world";
+      final String subject = "Facture attribué à : " + nomReceveur + "portant sur la facture N° : "  + sb.toString();
       final List<String> recipients = [mailSender];
 
       await sendEmailFunction(
@@ -257,6 +282,10 @@ class _ReservationListState extends State<ReservationList> {
 
         print('Réservation confirmée pour ${reservation.nom}');
 
+
+        String Date =   reservation.dateArrivee.toString() + " à "+ reservation.dateDepart.toString();
+        String Place = reservation.lieuDestination.toString() + " et "+ reservation.nomHotel.toString() ;
+
         // Envoyer un email pour la confirmation de l'hôtel et de la destination
         sendEmailDestinationHotel(
             reservation.nom,
@@ -264,7 +293,10 @@ class _ReservationListState extends State<ReservationList> {
             reservation.nomDestination,
             reservation.nomHotel,
             reservation.nbr_pers,
-          reservation.nbr_chambre
+            reservation.nbr_chambre,
+            reservation.nom,
+            Date,
+            Place
         );
       } else {
         // Si l'une ou l'autre des conditions échoue, afficher les messages appropriés
@@ -291,12 +323,16 @@ class _ReservationListState extends State<ReservationList> {
             where: 'id = ?',
             whereArgs: [reservation.id],
           );
-
+          String Date =  reservation.dateArrivee.toString() +  " à "+ reservation.dateDepart.toString();
+          String Place = reservation.nomHotel.toString() ;
           sendEmailHotel(
               reservation.nom,
               reservation.phone,
               reservation.nomHotel,
-              reservation.nbr_chambre
+              reservation.nbr_chambre,
+              reservation.nom,
+              Date,
+              Place
           );
         }
 
@@ -316,11 +352,18 @@ class _ReservationListState extends State<ReservationList> {
             whereArgs: [reservation.id],
           );
 
+
+          String Date = reservation.dateArrivee.toString() +  " à "+  reservation.dateDepart.toString();
+          String Place = reservation.lieuDestination.toString();
+
           sendEmailDestination(
               reservation.nom,
               reservation.phone,
               reservation.nomDestination,
-              reservation.nbr_pers
+              reservation.nbr_pers,
+              reservation.nom,
+              Date,
+              Place
           );
         }
       }
