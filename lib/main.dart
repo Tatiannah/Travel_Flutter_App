@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:projet1/screens/client_list_screen.dart';
-import 'package:projet1/screens/hotel_list_screen.dart';
-import 'package:projet1/screens/destination_list_screen.dart';
-import 'package:projet1/screens/reservation_list_screen.dart';
-import 'package:projet1/screens/statistics.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:projet1/services/database_helper.dart';
+ // Assurez-vous d'avoir ce modèle
+import 'dart:async';
+import 'package:projet1/screens/client_list_screen.dart';  // Assurez-vous que ce fichier existe et contient la classe ClientListScreen
+import 'package:projet1/screens/hotel_list_screen.dart';   // Assurez-vous que ce fichier existe et contient la classe HotelList
+import 'package:projet1/screens/destination_list_screen.dart'; // Assurez-vous que ce fichier existe et contient la classe DestinationList
+import 'package:projet1/screens/reservation_list_screen.dart'; // Assurez-vous que ce fichier existe et contient la classe ReservationList
+import 'package:projet1/screens/statistics.dart'; // Assurez-vous que ce fichier existe et contient la classe ClientChart
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +33,7 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   final List<Widget> _pages = [
     ClientListScreen(),
     HotelList(),
@@ -39,19 +42,88 @@ class _MainScreenState extends State<MainScreen> {
     ClientChart()
   ];
 
-  int _selectedIndex = 4;
+  Timer? _timer;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+  int _selectedIndex = 4;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  int _unconfirmedCount = 0;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _animationController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _fetchUnconfirmedCount();
+    _updateNotificationCount();
+
+    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      _updateNotificationCount();
     });
   }
 
-  Color hexToColor(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('FF');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
+  Future<void> _updateNotificationCount() async {
+    final count = await DatabaseHelper.instance.countUnconfirmed();
+    setState(() {
+      _unconfirmedCount = count;
+      if (_unconfirmedCount == 0) {
+        _animationController.stop();
+      } else {
+        _animationController.repeat(reverse: true);
+      }
+    });
+  }
+
+  Future<void> _fetchUnconfirmedCount() async {
+    // Initial fetching of unconfirmed count
+    final count = await DatabaseHelper.instance.countUnconfirmed();
+    setState(() {
+      _unconfirmedCount = count;
+      if (_unconfirmedCount == 0) {
+        _animationController.stop();
+      } else {
+        _animationController.repeat(reverse: true);
+      }
+    });
+  }
+
+  void _showUnconfirmedDialog() async {
+
+    final unconfirmed = await DatabaseHelper.instance.queryUnconfirmed();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Unconfirmed Items'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: unconfirmed.map((reservation) {
+              return ListTile(
+                title: Text(reservation.nom), // Assurez-vous d'utiliser le bon champ
+                subtitle: Text('Status: ${reservation.isConfirmed ? 'Confirmed' : 'Not Confirmed'}'),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -70,10 +142,43 @@ class _MainScreenState extends State<MainScreen> {
                 color: Colors.white70,
               ),
             ),
-            Spacer(), // Pour espacer le texte et l'icône/logo
-            Icon(
-              Icons.notifications, // Remplacez avec votre icône ou image
-              color: Colors.white70,
+            Spacer(),
+            Stack(
+              children: [
+                IconButton(
+                  icon: RotationTransition(
+                    turns: _animation,
+                    child: Icon(Icons.notifications, color: Colors.white70),
+                  ),
+                  onPressed: _showUnconfirmedDialog,
+                ),
+                if (_unconfirmedCount > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$_unconfirmedCount',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -103,11 +208,22 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
         backgroundColor: Colors.blue,
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('FF');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
   }
 }

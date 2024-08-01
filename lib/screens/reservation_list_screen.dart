@@ -140,9 +140,7 @@ class _ReservationListState extends State<ReservationList> {
       final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
       final String mailSender = await _searchEmail(name, phone);
 
-      if(priceDest == null && priceHotel == null){
-        throw Exception("error");
-      }
+
       if(priceDest == null){
         throw Exception("error");
       }
@@ -151,15 +149,19 @@ class _ReservationListState extends State<ReservationList> {
       }
 
       String concat =  ((priceHotel*nbrooms)+ (priceDest*nbpers)).toString() ;
-      final String body = "Description du Voyage :" + "\n" + "Montant Total : "+concat  + " MGA"+"\n"
+      final String body = "Description du Voyage :" + "\n" + "Montant Total : "+ concat  + " MGA"+"\n"
           + "Date de Voyage :"+ date + "\n" +"Lieu : "+ Lieu;
-      final String subject = "Facture attribué à : " + nomReceveur + "portant sur la facture N° : "  + sb.toString();;
+      final String subject = "Facture attribué à : " + nomReceveur + "portant sur la facture N° : "  + sb.toString();
       final List<String> recipients = [mailSender];
 
       print(concat);
       print(priceDest);
       print(priceHotel);
       print(mailSender);
+      print(nomReceveur);
+      print(date);
+      print(Lieu);
+
       await sendEmailFunction(
         body: body,
         recipients: recipients,

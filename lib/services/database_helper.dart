@@ -378,4 +378,25 @@ class DatabaseHelper {
     }
   }
 
+  Future<int> countUnconfirmed() async {
+    final db = await instance.database;
+    final result = await db.rawQuery('SELECT COUNT(*) FROM reservation WHERE isConfirmed = 0');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  Future<List<Reservation>> queryUnconfirmed() async {
+    final db = await instance.database;
+    final maps = await db.query(
+      'reservation',
+      where: 'isConfirmed = ?',
+      whereArgs: [0],
+    );
+
+    if (maps.isNotEmpty) {
+      return maps.map((map) => Reservation.fromMap(map)).toList();
+    } else {
+      return [];
+    }
+  }
+
 }
