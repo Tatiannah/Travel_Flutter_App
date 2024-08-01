@@ -54,61 +54,89 @@ class HotelDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    hotel.nom,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Icon(Icons.hotel, size: 24, color: Colors.blue),
+                      SizedBox(width: 8), // Corrected value
+                      Text(
+                        hotel.nom,
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '${hotel.lieu}',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  SizedBox(height: 8), // Corrected value
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, size: 24, color: Colors.blue),
+                      SizedBox(width: 8), // Corrected value
+                      Text(
+                        '${hotel.lieu}',
+                        style: TextStyle(fontSize: 24, color: Colors.grey),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16),
-                  Text(
-                    '${hotel.prix} Ar/night',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Icon(Icons.monetization_on, size: 24, color: Colors.blue),
+                      SizedBox(width: 8), // Corrected value
+                      Text(
+                        '${hotel.prix} Ar/night',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16),
-                  Text(
-                    hotel.description ?? 'Aucune description disponible.',
-                    style: TextStyle(fontSize: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.description, size: 24, color: Colors.blue),
+                      SizedBox(width: 8), // Corrected value
+                      Expanded(
+                        child: Text(
+                          hotel.description ?? 'Aucune description disponible.',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
                   ),
-
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 50),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Afficher une boîte de dialogue de confirmation avant de supprimer
-                  bool confirmDelete = await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Confirm deletion'),
-                      content: Text('Are you sure you want to remove this hotel from your list ?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          },
-                          child: Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                          child: Text('Delete'),
-                        ),
-                      ],
-                    ),
-                  );
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    // Afficher une boîte de dialogue de confirmation avant de supprimer
+                    bool confirmDelete = await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Confirm deletion'),
+                        content: Text('Are you sure you want to remove this hotel from your list?'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                            child: Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
 
-                  // Si l'utilisateur confirme la suppression, procéder à la suppression
-                  if (confirmDelete) {
-                    await DatabaseHelper.instance.deleteHotel(hotel.id!);
-                    toastification.show(
+                    // Si l'utilisateur confirme la suppression, procéder à la suppression
+                    if (confirmDelete) {
+                      await DatabaseHelper.instance.deleteHotel(hotel.id!);
+                      toastification.show(
                         context: context, // optional if you use ToastificationWrapper
                         type: ToastificationType.success,
                         style: ToastificationStyle.fillColored,
@@ -118,29 +146,19 @@ class HotelDetailScreen extends StatelessWidget {
                         description: RichText(text: const TextSpan(text: 'Hotel deleted successfully ')),
                         alignment: Alignment.topRight,
                         direction: TextDirection.ltr,
-                        animationDuration: const Duration(milliseconds: 300)
-                    );
-                    Navigator.pop(context, true);
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 8),
-                    Text('Delete'),
-                  ],
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                        animationDuration: const Duration(milliseconds: 300),
+                      );
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  child: Icon(Icons.delete),
+                  backgroundColor: Colors.blue,
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 }
-

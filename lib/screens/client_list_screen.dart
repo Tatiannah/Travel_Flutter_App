@@ -62,22 +62,15 @@ class _ClientListScreenState extends State<ClientListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Clients List'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddClientScreen()),
-              );
-              if (result == true) {
-                _fetchClients();
-              }
-            },
-          ),
-        ],
+        title: Text('Clients List',
+          style: TextStyle(
+            fontWeight: FontWeight.bold, // Texte en gras
+            fontSize: 25.0,
+            // Taille de la police
+          )),
+        centerTitle: true, // Centre le titre dans l'AppBar
       ),
+
       body: Column(
         children: <Widget>[
           Padding(
@@ -97,7 +90,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
               itemBuilder: (context, index) {
                 final client = _filteredClients[index];
                 return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Espacement autour de chaque élément
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8), // Espacement autour de chaque élément
                   elevation: 4, // Élémentation de l'ombre de la carte
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10), // Bordures arrondies
@@ -110,14 +103,22 @@ class _ClientListScreenState extends State<ClientListScreen> {
                       ),
                       backgroundColor: Colors.blue, // Couleur de fond de l'avatar
                     ),
-                    title: Text(client.nom),
+                    title: Text(
+                    client.nom,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Texte en gras
+                      fontSize: 15.0,              // Taille de la police
+                    ),
+                  ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
                         Row(
                           children: [
+
                             Icon(Icons.email, size: 16), // Icône d'email
-                            SizedBox(width: 4), // Espacement entre l'icône et le texte
+                            // Espacement entre l'icône et le texte
                             Text(client.email),
                           ],
                         ),
@@ -134,8 +135,10 @@ class _ClientListScreenState extends State<ClientListScreen> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        SizedBox(width: 4),
                         IconButton(
                           icon: Icon(Icons.edit),
+
                           onPressed: () async {
                             final result = await Navigator.push(
                               context,
@@ -165,6 +168,19 @@ class _ClientListScreenState extends State<ClientListScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddClientScreen()),
+          );
+          if (result == true) {
+            _fetchClients();
+          }
+        },
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positionnement en bas à droite
     );
   }
 

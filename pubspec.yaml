@@ -22,6 +22,7 @@ dependencies:
   flutter_email_sender: ^6.0.3
   url_launcher: ^6.3.0
   mailer: ^6.1.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

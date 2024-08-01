@@ -4,6 +4,7 @@ import 'package:projet1/screens/hotel_list_screen.dart';
 import 'package:projet1/screens/destination_list_screen.dart';
 import 'package:projet1/screens/reservation_list_screen.dart';
 import 'package:projet1/screens/statistics.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +17,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Travel Booking App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
+
       ),
       home: MainScreen(),
     );
@@ -45,20 +47,36 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Color hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('FF');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            'Travel Booking App',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+        backgroundColor: hexToColor('#244D61'),
+        title: Row(
+          children: <Widget>[
+            Text(
+              'Travel Booking App',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Tahoma',
+                color: Colors.white70,
+              ),
             ),
-          ),
+            Spacer(), // Pour espacer le texte et l'icône/logo
+            Icon(
+              Icons.notifications, // Remplacez avec votre icône ou image
+              color: Colors.white70,
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

@@ -13,6 +13,8 @@ class DestinationList extends StatefulWidget {
 
 class _DestinationListState extends State<DestinationList> {
   List<Destination> _destinationList = [];
+  List<Destination> _filteredDestinations = []; // Liste filtrée pour la recherche
+  String _searchQuery = ""; // Requête de recherche
 
   @override
   void initState() {
@@ -22,24 +24,54 @@ class _DestinationListState extends State<DestinationList> {
 
   void _loadDestinations() async {
     _destinationList = await DatabaseHelper.instance.queryAllDestinations();
-    setState(() {});
+    _filterDestinations(); // Appliquer le filtrage initial (peut-être vide)
+  }
+
+  void _filterDestinations() {
+    setState(() {
+      if (_searchQuery.isEmpty) {
+        _filteredDestinations = _destinationList;
+      } else {
+        _filteredDestinations = _destinationList.where((destination) {
+          return destination.nom.toLowerCase().contains(_searchQuery.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filterDestinations();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Destinations List ')),
+      appBar: AppBar(title: Text('Destinations List')),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'Search',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: _onSearchChanged,
+              ),
+            ),
             // Carrousel horizontal pour les premières cartes
             Container(
               height: 250,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: _destinationList.length > 6 ? 6 : _destinationList.length,
+                itemCount: _filteredDestinations.length > 6 ? 6 : _filteredDestinations.length,
                 itemBuilder: (context, index) {
-                  final destination = _destinationList[index];
+                  final destination = _filteredDestinations[index];
                   return Container(
                     width: 200,
                     margin: EdgeInsets.all(8.0),
@@ -102,9 +134,9 @@ class _DestinationListState extends State<DestinationList> {
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: _destinationList.length - 6 > 0 ? _destinationList.length - 6 : 0,
+              itemCount: _filteredDestinations.length - 6 > 0 ? _filteredDestinations.length - 6 : 0,
               itemBuilder: (context, index) {
-                final destination = _destinationList[index + 6];
+                final destination = _filteredDestinations[index + 6];
                 return ListTile(
                   title: Text(destination.nom),
                   subtitle: Text('${destination.prix} Ar/pers'),
@@ -166,9 +198,7 @@ class _DestinationListState extends State<DestinationList> {
                           );
 
                           if (confirmDelete) {
-
                             await DatabaseHelper.instance.deleteDestination(destination.id!);
-
                             _loadDestinations();
                           }
                         },
