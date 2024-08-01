@@ -86,14 +86,20 @@ class _ReservationListState extends State<ReservationList> {
   }
 
 
-  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content) async {
+  Future<void> sendEmailHotel(String nameX,String phoneX ,String? Content , int nbrooms ) async {
     final String name = nameX;
     final String phone = phoneX ;
 
     try {
       final double? price = await GetPriceHotel(Content ?? 'None');
       final String mailSender = await _searchEmail(name, phone);
-      final String body =price.toString();
+
+      if (price == null) {
+        throw Exception('Price not found');
+      }
+
+      final String body = (price * nbrooms).toString();
+
       final String subject = "hello world";
       final List<String> recipients = [mailSender];
 
@@ -109,7 +115,7 @@ class _ReservationListState extends State<ReservationList> {
     }
   }
 
-  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel ) async {
+  Future<void> sendEmailDestinationHotel(String nameX,String phoneX ,String? ContentDestination,String? ContentHotel,int nbpers , int nbrooms ) async {
     final String name = nameX;
     final String phone = phoneX ;
 
@@ -117,7 +123,18 @@ class _ReservationListState extends State<ReservationList> {
       final double? priceHotel = await GetPriceHotel(ContentHotel ?? 'None');
       final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
       final String mailSender = await _searchEmail(name, phone);
-      String concat =  priceHotel.toString() + '' +  priceDest.toString() ;
+
+      if(priceDest == null && priceHotel == null){
+        throw Exception("error");
+      }
+      if(priceDest == null){
+        throw Exception("error");
+      }
+      if(priceHotel == null){
+        throw Exception("error");
+      }
+
+      String concat =  ((priceHotel*nbrooms)+ (priceDest*nbpers)).toString() ;
       final String body = concat;
       final String subject = "hello world";
       final List<String> recipients = [mailSender];
@@ -136,7 +153,7 @@ class _ReservationListState extends State<ReservationList> {
     }
   }
 
-  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination ) async {
+  Future<void> sendEmailDestination(String nameX,String phoneX ,String? ContentDestination , int nbpers) async {
     final String name = nameX;
     final String phone = phoneX ;
 
@@ -144,7 +161,13 @@ class _ReservationListState extends State<ReservationList> {
 
       final double? priceDest = await GetPriceDestination(ContentDestination ?? 'None');
       final String mailSender = await _searchEmail(name, phone);
-      final String body ='' +  priceDest.toString() ;
+
+      if (priceDest == null) {
+        throw Exception('Price not found');
+      }
+
+      final String body = (priceDest * nbpers).toString();
+
       final String subject = "hello world";
       final List<String> recipients = [mailSender];
 
@@ -239,7 +262,9 @@ class _ReservationListState extends State<ReservationList> {
             reservation.nom,
             reservation.phone,
             reservation.nomDestination,
-            reservation.nomHotel
+            reservation.nomHotel,
+            reservation.nbr_pers,
+          reservation.nbr_chambre
         );
       } else {
         // Si l'une ou l'autre des conditions échoue, afficher les messages appropriés
@@ -270,7 +295,8 @@ class _ReservationListState extends State<ReservationList> {
           sendEmailHotel(
               reservation.nom,
               reservation.phone,
-              reservation.nomHotel
+              reservation.nomHotel,
+              reservation.nbr_chambre
           );
         }
 
@@ -293,7 +319,8 @@ class _ReservationListState extends State<ReservationList> {
           sendEmailDestination(
               reservation.nom,
               reservation.phone,
-              reservation.nomDestination
+              reservation.nomDestination,
+              reservation.nbr_pers
           );
         }
       }
